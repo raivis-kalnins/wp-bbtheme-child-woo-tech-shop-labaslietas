@@ -1,0 +1,1 @@
+<?php get_header(); ?><main class="labaslietas-container labaslietas-content"><?php if (have_posts()) : while (have_posts()) : the_post(); ?><article <?php post_class('labaslietas-entry'); ?>><h1><?php the_title(); ?></h1><?php the_content(); ?></article><?php endwhile; else: ?><p><?php esc_html_e('Nothing found.', 'labaslietas'); ?></p><?php endif; ?></main><?php get_footer();

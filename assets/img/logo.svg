@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" role="img" aria-labelledby="title desc">
+<title id="title">Labas Lietas</title><desc id="desc">Labas Lietas veikala logotips</desc>
+<rect width="720" height="180" fill="none"/>
+<g transform="translate(12 10)">
+  <path d="M72 2 142 47v86c0 18-14 32-32 32H34c-18 0-32-14-32-32V47L72 2Z" fill="#f3f7f2" stroke="#1f7a3c" stroke-width="8"/>
+  <path d="M72 14 16 52v43h56V14Z" fill="#2f8b49"/>
+  <path d="M72 14v81h56V52L72 14Z" fill="#163047"/>
+  <path d="M16 99v31c0 13 10 23 23 23h33V99H16Z" fill="#163047"/>
+  <path d="M72 99v54h33c13 0 23-10 23-23V99H72Z" fill="#48a85e"/>
+  <g fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M29 50h29m-19-12 13 13-13 13"/>
+    <path d="M92 42v27m-10-17h20M88 72h8"/>
+    <path d="M31 119h27m-22-13 17 13-17 13"/>
+    <path d="M89 116c10-13 25-10 28 1-1 11-12 19-28 21 7-6 10-14 0-22Z"/>
+  </g>
+</g>
+<g transform="translate(182 35)">
+  <text x="0" y="54" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="800" letter-spacing="-2" fill="#163047">Labas</text>
+  <text x="176" y="54" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="800" letter-spacing="-2" fill="#2f8b49">Lietas</text>
+  <text x="2" y="98" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" letter-spacing="3" fill="#637180">MĀJAI • DARBAM • DĀRZAM</text>
+</g>
+</svg>
