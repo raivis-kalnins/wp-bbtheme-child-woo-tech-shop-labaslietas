@@ -8,7 +8,7 @@ get_header(); ?>
 <?php if (function_exists('labaslietas_seo_breadcrumbs_235')) { echo labaslietas_seo_breadcrumbs_235(); } ?>
 <?php while (have_posts()) : the_post();
     $slug = get_post_field('post_name', get_the_ID());
-    $is_info = function_exists('labaslietas_information_page_definitions') && array_key_exists($slug, labaslietas_information_page_definitions());
+    $is_info = (function_exists('labaslietas_information_page_definitions') && array_key_exists($slug, labaslietas_information_page_definitions())) || in_array($slug, array('piegade-un-apmaksa','delivery-payment','about-us'), true);
 ?>
   <header class="labaslietas-page-heading<?php echo $is_info ? ' labaslietas-info-heading' : ''; ?>">
     <?php if ($is_info) : ?><span class="labaslietas-page-kicker">LABAS LIETAS.LV</span><?php endif; ?>

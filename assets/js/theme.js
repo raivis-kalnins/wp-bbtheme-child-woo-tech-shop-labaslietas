@@ -108,21 +108,26 @@
     var $box = $form.find('.labaslietas-search-results');
     var items = data && data.items ? data.items : [];
     var allUrl = data && data.allUrl ? data.allUrl : ($form.attr('action') + '?s=' + encodeURIComponent(query) + '&post_type=product');
+    var allLabel = data && data.allLabel ? data.allLabel : 'Skatīt visus rezultātus';
+    var emptyLabel = data && data.emptyLabel ? data.emptyLabel : 'Preces netika atrastas.';
+    var esc = function(v){ return $('<div>').text(v == null ? '' : String(v)).html(); };
     var html = '';
     if(items.length){
       html += '<div class="labaslietas-search-results-list">';
       items.forEach(function(item){
-        html += '<a class="labaslietas-search-result" href="'+ item.url +'">';
-        html += item.image ? '<img src="'+ item.image +'" alt="">' : '<span class="labaslietas-search-noimg"></span>';
-        html += '<span><strong>'+ $('<div>').text(item.title).html() +'</strong>';
-        html += '<small>' + (item.sku ? 'SKU: '+ $('<div>').text(item.sku).html() +' · ' : '') + 'ID: '+ item.id + (item.price ? ' · '+ $('<div>').text(item.price).html() : '') + '</small></span>';
-        html += '</a>';
+        html += '<a class="labaslietas-search-result" href="'+ esc(item.url) +'">';
+        html += item.image ? '<img src="'+ esc(item.image) +'" alt="">' : '<span class="labaslietas-search-noimg"></span>';
+        html += '<span class="llg-search-result-copy">';
+        html += '<span class="llg-search-result-top"><span class="llg-search-result-stock">'+ esc(item.stock || '') +'</span>' + (item.category ? '<span>'+ esc(item.category) +'</span>' : '') + '</span>';
+        html += '<strong>'+ esc(item.title) +'</strong>';
+        html += '<span class="llg-search-result-bottom"><small>' + (item.sku ? 'SKU: '+ esc(item.sku) : 'ID: '+ esc(item.id)) + '</small><span class="llg-search-result-prices">' + (item.regularPrice ? '<del>'+ esc(item.regularPrice) +'</del>' : '') + '<span class="llg-search-result-price">'+ esc(item.price || '') +'</span></span></span>';
+        html += '</span></a>';
       });
       html += '</div>';
     }else{
-      html += '<div class="labaslietas-search-empty">Nekas nav atrasts pēc šī vaicājuma.</div>';
+      html += '<div class="labaslietas-search-empty">'+ esc(emptyLabel) +'</div>';
     }
-    html += '<a class="labaslietas-search-all" href="'+ allUrl +'">Skatīt visus meklēšanas rezultātus →</a>';
+    html += '<a class="labaslietas-search-all" href="'+ esc(allUrl) +'">'+ esc(allLabel) +' →</a>';
     $box.html(html).removeAttr('hidden');
   }
   $(document).on('input focus', '.labaslietas-ajax-search input[type="search"]', function(){
@@ -755,3 +760,188 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+
+/* 3.0.3: contain third-party chat icons; never hide body/html/ancestors. */
+(function(){
+  function normalizeChatIcons(){
+    var q='a[href*="wa.me"] svg,a[href*="api.whatsapp.com"] svg,a[href*="whatsapp.com/send"] svg,[class*="whatsapp"] svg,[id*="whatsapp"] svg,[class*="joinchat"] svg,[id*="qlwapp"] svg,[class*="ht-ctc"] svg';
+    document.querySelectorAll(q).forEach(function(svg){
+      svg.style.setProperty('width','32px','important');
+      svg.style.setProperty('height','32px','important');
+      svg.style.setProperty('max-width','32px','important');
+      svg.style.setProperty('max-height','32px','important');
+    });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',normalizeChatIcons);}else{normalizeChatIcons();}
+  window.addEventListener('load',normalizeChatIcons);
+  setTimeout(normalizeChatIcons,700);
+})();
+
+
+/* 3.0.4: clean scroll-to-top + safe replacement for malformed WhatsApp widgets. */
+(function(){
+  function ready(fn){if(document.readyState!=='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}
+  ready(function(){
+    var topButton=document.querySelector('.llg-scroll-top');
+    function updateTop(){if(!topButton)return;topButton.classList.toggle('is-visible',(window.pageYOffset||document.documentElement.scrollTop||0)>420);}
+    if(topButton){
+      updateTop();
+      window.addEventListener('scroll',updateTop,{passive:true});
+      topButton.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+    }
+
+    function hideThirdPartyWhatsApp(){
+      var direct=['#qlwapp','.qlwapp','.joinchat','.ht-ctc','.ht-ctc-chat','#ht-ctc-chat','.wa__btn_popup','.whatsapp_chat_support','.whatsapp-widget','.whatsapp-chat','[data-id="whatsapp"]'];
+      document.querySelectorAll(direct.join(',')).forEach(function(el){if(!el.classList.contains('llg-whatsapp-fab'))el.style.setProperty('display','none','important');});
+      document.querySelectorAll('a[href*="wa.me"],a[href*="api.whatsapp.com"],a[href*="whatsapp.com/send"]').forEach(function(anchor){
+        if(anchor.classList.contains('llg-whatsapp-fab'))return;
+        var el=anchor;
+        for(var i=0;i<6;i++){
+          var parent=el.parentElement;
+          if(!parent||parent===document.body||parent===document.documentElement)break;
+          var token=((parent.id||'')+' '+(typeof parent.className==='string'?parent.className:'')).toLowerCase();
+          var pos=''; try{pos=window.getComputedStyle(parent).position;}catch(e){}
+          if(/whatsapp|joinchat|qlwapp|ht-ctc|wa__|chat-support|chat_widget/.test(token)||pos==='fixed'){
+            parent.style.setProperty('display','none','important');
+            return;
+          }
+          el=parent;
+        }
+        anchor.style.setProperty('display','none','important');
+      });
+    }
+    hideThirdPartyWhatsApp();
+    window.addEventListener('load',hideThirdPartyWhatsApp);
+    setTimeout(hideThirdPartyWhatsApp,700);
+    setTimeout(hideThirdPartyWhatsApp,1800);
+  });
+})();
+
+
+/* 3.0.5 safe floating-widget cleanup. */
+(function(){
+  function ready(fn){if(document.readyState!=='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}
+  function clean(){
+    document.querySelectorAll('.wp-theme-quote-floating').forEach(function(el){el.classList.add('llg-quote-left');});
+    document.querySelectorAll('a[href*="wa.me"],a[href*="api.whatsapp.com"],a[href*="whatsapp.com/send"]').forEach(function(anchor){
+      if(anchor.classList.contains('llg-whatsapp-fab')) return;
+      var node=anchor;
+      for(var i=0;i<5;i++){
+        var parent=node.parentElement;
+        if(!parent||parent===document.body||parent===document.documentElement||parent.tagName==='FOOTER') break;
+        var text=(parent.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+        var token=((parent.id||'')+' '+(typeof parent.className==='string'?parent.className:'')).toLowerCase();
+        if(text.indexOf('usually replies soon')!==-1 || /whatsapp|joinchat|qlwapp|ht-ctc|wa__/.test(token)){
+          parent.classList.add('llg-thirdparty-whatsapp-hidden');
+          return;
+        }
+        node=parent;
+      }
+      anchor.classList.add('llg-thirdparty-whatsapp-hidden');
+    });
+  }
+  ready(clean);
+  window.addEventListener('load',clean);
+  setTimeout(clean,800);
+  setTimeout(clean,1800);
+})();
+
+
+/* 3.0.6: remove false top/bottom gaps without hiding page containers. */
+(function(){
+  function ready(fn){if(document.readyState!=='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}
+  function adminBarState(){
+    var body=document.body, bar=document.getElementById('wpadminbar');
+    if(!body) return;
+    var visible=false;
+    if(bar){
+      try{
+        var cs=window.getComputedStyle(bar), r=bar.getBoundingClientRect();
+        visible=cs.display!=='none' && cs.visibility!=='hidden' && r.height>10 && r.width>10;
+      }catch(e){}
+    }
+    body.classList.toggle('llg-adminbar-visible',visible);
+    document.documentElement.style.setProperty('margin-top','0px','important');
+  }
+  function cleanAfterFooter(){
+    var footer=document.querySelector('.llg-footer');
+    if(!footer || !footer.parentElement) return;
+    var node=footer.nextElementSibling;
+    while(node){
+      var next=node.nextElementSibling;
+      var tag=(node.tagName||'').toLowerCase();
+      var cls=(typeof node.className==='string'?node.className:'').toLowerCase();
+      var id=(node.id||'').toLowerCase();
+      var text=(node.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+      var allowed=node.classList && (node.classList.contains('llg-whatsapp-fab') || node.classList.contains('llg-scroll-top') || node.classList.contains('wp-theme-quote-floating'));
+      var hasWa=false;
+      try{hasWa=!!node.querySelector('a[href*="wa.me"],a[href*="api.whatsapp.com"],a[href*="whatsapp.com/send"]');}catch(e){}
+      var widgetLike=/whatsapp|joinchat|qlwapp|ht-ctc|wa__|chat-support|chat_widget/.test(cls+' '+id) || /usually replies soon|start whatsapp chat|hi, how can we help|hi, i would like to chat/.test(text) || hasWa;
+      if(!allowed && tag!=='script' && tag!=='style' && tag!=='link' && tag!=='template' && widgetLike){
+        node.classList.add('llg-after-footer-widget-hidden');
+        node.setAttribute('aria-hidden','true');
+      }
+      node=next;
+    }
+  }
+  function run(){adminBarState();cleanAfterFooter();}
+  ready(run);
+  window.addEventListener('load',run);
+  setTimeout(run,500);
+  setTimeout(run,1600);
+})();
+
+/* 3.0.7: remove empty template-part spacer nodes and provide a reliable mobile menu. */
+(function(){
+  function ready(fn){if(document.readyState!=='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}
+  function isEmptySpacer(node){
+    if(!node || node.nodeType!==1) return false;
+    var tag=(node.tagName||'').toLowerCase();
+    if(tag==='br') return true;
+    if(tag!=='p') return false;
+    var html=(node.innerHTML||'').replace(/&nbsp;|&#160;/gi,'').replace(/<br\s*\/?\s*>/gi,'').replace(/\s+/g,'');
+    return html==='';
+  }
+  function cleanTemplateParts(){
+    document.querySelectorAll('header.wp-block-template-part,footer.wp-block-template-part').forEach(function(part){
+      Array.prototype.slice.call(part.children||[]).forEach(function(child){if(isEmptySpacer(child)){child.remove();}});
+      var children=Array.prototype.slice.call(part.children||[]).filter(function(child){return !isEmptySpacer(child) && !/^(script|style|link|template)$/i.test(child.tagName||'');});
+      if(children.length===1){
+        var child=children[0];
+        if((part.tagName==='HEADER' && child.classList.contains('llg-header')) || (part.tagName==='FOOTER' && child.classList.contains('llg-footer'))){
+          part.parentNode.insertBefore(child,part);part.remove();
+        }
+      }
+    });
+  }
+  function closeMobileMenu(){
+    var panel=document.getElementById('llg-mobile-menu-panel');
+    var toggle=document.querySelector('.llg-mobile-menu-toggle');
+    if(panel) panel.setAttribute('hidden','hidden');
+    if(toggle) toggle.setAttribute('aria-expanded','false');
+    if(document.body) document.body.classList.remove('llg-mobile-menu-open');
+  }
+  function initMobileMenu(){
+    var panel=document.getElementById('llg-mobile-menu-panel');
+    var toggle=document.querySelector('.llg-mobile-menu-toggle');
+    if(!panel||!toggle) return;
+    toggle.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      var opening=panel.hasAttribute('hidden');
+      if(opening){
+        panel.removeAttribute('hidden');toggle.setAttribute('aria-expanded','true');document.body.classList.add('llg-mobile-menu-open');
+        var catalog=document.querySelector('.llg-catalog-wrap');if(catalog){catalog.classList.remove('is-open');var cb=catalog.querySelector('.llg-catalog-button');if(cb)cb.setAttribute('aria-expanded','false');}
+      }else{closeMobileMenu();}
+    });
+    panel.addEventListener('click',function(e){e.stopPropagation();});
+    var close=panel.querySelector('.llg-mobile-menu-close');if(close)close.addEventListener('click',function(e){e.preventDefault();closeMobileMenu();});
+    panel.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeMobileMenu);});
+    document.addEventListener('click',function(e){if(!panel.hasAttribute('hidden')&&!toggle.contains(e.target)&&!panel.contains(e.target)){closeMobileMenu();}});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMobileMenu();});
+    window.addEventListener('resize',function(){if(window.innerWidth>820)closeMobileMenu();},{passive:true});
+  }
+  ready(function(){cleanTemplateParts();initMobileMenu();});
+  window.addEventListener('load',cleanTemplateParts);
+  setTimeout(cleanTemplateParts,500);
+})();

@@ -69,33 +69,10 @@ function labaslietas_logo_attachment_class($attachment_id) {
 }
 
 function labaslietas_logo_html() {
-    $logo_id = absint(labaslietas_get_theme_option('logo_id', ''));
-    $width = absint(labaslietas_get_theme_option('logo_width', '260'));
-    $height = absint(labaslietas_get_theme_option('logo_height', '118'));
-    if ($width < 120) { $width = 120; }
-    if ($width > 520) { $width = 520; }
-    if ($height < 70) { $height = 70; }
-    if ($height > 180) { $height = 180; }
-    $style = 'style="--labaslietas-logo-width:' . esc_attr($width) . 'px;--labaslietas-logo-height:' . esc_attr($height) . 'px"';
-
-    if ($logo_id) {
-        $class = 'labaslietas-dynamic-logo' . labaslietas_logo_attachment_class($logo_id);
-        $img = wp_get_attachment_image($logo_id, 'full', false, array('class' => trim($class), 'alt' => get_bloginfo('name'), 'loading' => 'eager'));
-        if ($img) {
-            return '<a class="labaslietas-logo labaslietas-dynamic-logo-link" ' . $style . ' href="' . esc_url(home_url('/')) . '" aria-label="' . esc_attr(get_bloginfo('name')) . '"><span class="labaslietas-logo-crop">' . $img . '</span></a>';
-        }
-    }
-
-    $custom_logo_id = absint(get_theme_mod('custom_logo'));
-    if ($custom_logo_id) {
-        $class = 'custom-logo labaslietas-dynamic-logo' . labaslietas_logo_attachment_class($custom_logo_id);
-        $img = wp_get_attachment_image($custom_logo_id, 'full', false, array('class' => trim($class), 'alt' => get_bloginfo('name'), 'loading' => 'eager'));
-        if ($img) {
-            return '<a class="labaslietas-logo labaslietas-logo-custom-wrap" ' . $style . ' href="' . esc_url(home_url('/')) . '" aria-label="' . esc_attr(get_bloginfo('name')) . '"><span class="labaslietas-logo-crop">' . $img . '</span></a>';
-        }
-    }
-
-    return '<a class="labaslietas-logo labaslietas-bundled-logo" ' . $style . ' href="' . esc_url(home_url('/')) . '" aria-label="' . esc_attr(get_bloginfo('name')) . '"><img src="' . esc_url(get_stylesheet_directory_uri() . '/assets/img/logo.svg') . '" alt="Labas Lietas" loading="eager"></a>';
+    // v3.0.3: use the approved Labas Lietas mark consistently in header/footer.
+    // Ignore stale Media Library/custom-logo settings from older demo imports.
+    $url = trailingslashit(get_stylesheet_directory_uri()) . 'assets/img/logo-approved.png';
+    return '<a class="labaslietas-logo labaslietas-approved-logo" href="' . esc_url(home_url('/')) . '" aria-label="Labas Lietas"><img src="' . esc_url($url) . '" width="248" height="115" alt="Labas Lietas" loading="eager" decoding="async"></a>';
 }
 
 function labaslietas_category_icon_html($term = null, $force_default = true) {
@@ -295,6 +272,10 @@ function labaslietas_product_category_links($limit = 12) {
     if (is_wp_error($terms) || empty($terms)) {
         return '';
     }
+    $blocked_demo_slugs = array('accessories','apparel','bundles','home-living','office','tech');
+    $terms = array_values(array_filter((array)$terms, function($term) use ($blocked_demo_slugs) {
+        return isset($term->slug) && !in_array($term->slug, $blocked_demo_slugs, true);
+    }));
     $terms = labaslietas_category_display_order($terms);
     $out = '';
     foreach ($terms as $term) {
@@ -1446,6 +1427,20 @@ if (!function_exists('labaslietas_v38_gallery_items')) {
             if ($gid && !in_array($gid, $ids, true)) { $ids[] = $gid; }
         }
         if (empty($ids)) {
+            $demo_map = array(
+                'LL-DEMO-D20'=>'drill.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder.png','LL-DEMO-G3500'=>'generator.png',
+                'LL-DEMO-J3T'=>'jack.png','LL-DEMO-A1500'=>'impact-wrench.png','LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower.png',
+                'LL-DEMO-BC52'=>'brushcutter.png','LL-DEMO-H10'=>'trimmer-head.png','LL-DEMO-HALU'=>'aluminum-head.png','LL-DEMO-L24'=>'trimmer-line.png',
+                'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png'
+            );
+            $sku = (string)$product->get_sku();
+            if (!empty($demo_map[$sku])) {
+                $path = get_stylesheet_directory() . '/assets/demo-products/' . $demo_map[$sku];
+                if (file_exists($path)) {
+                    $url = get_stylesheet_directory_uri() . '/assets/demo-products/' . $demo_map[$sku];
+                    return array(array('thumb'=>$url, 'main'=>$url, 'full'=>$url, 'alt'=>$product->get_name()));
+                }
+            }
             $ph = wc_placeholder_img_src('woocommerce_single');
             return array(array('thumb'=>$ph, 'main'=>$ph, 'full'=>$ph, 'alt'=>$product->get_name()));
         }
@@ -1627,35 +1622,66 @@ function labaslietas_sync_menus_234() {
 if (!function_exists('wp_theme_import_demo_homepage')) {
     function wp_theme_import_demo_homepage() {
         if (!current_user_can('edit_theme_options')) { return new WP_Error('forbidden','Nav tiesību sinhronizēt Starter Setup.'); }
-        if (function_exists('labaslietas_ensure_wc_core_pages_v18')) { labaslietas_ensure_wc_core_pages_v18(); }
-        if (function_exists('labaslietas_ensure_information_pages')) { labaslietas_ensure_information_pages(); }
-
-        $page = get_page_by_path('demo-homepage');
-        $args = array(
-            'post_title'=>'Labas Lietas sākumlapa','post_name'=>'demo-homepage','post_status'=>'publish','post_type'=>'page',
-            'post_content'=>'<!-- wp:shortcode -->[labaslietas_home]<!-- /wp:shortcode -->',
-        );
-        if ($page instanceof WP_Post) { $args['ID']=$page->ID; $page_id=wp_update_post($args,true); }
-        else { $page_id=wp_insert_post($args,true); }
-        if (is_wp_error($page_id)) { return $page_id; }
-
-        update_post_meta($page_id,'_wp_theme_demo_homepage',1);
-        update_post_meta($page_id,'_wp_theme_demo_profile','labaslietas');
-        update_option('show_on_front','page');
-        update_option('page_on_front',(int)$page_id);
-        update_option('wp_theme_active_demo_profile','labaslietas');
-        update_option('wp_theme_demo_import_version',(string)wp_get_theme()->get('Version'),false);
-
-        if (function_exists('labaslietas_green_cleanup_parent_demo')) { labaslietas_green_cleanup_parent_demo(); }
-        if (function_exists('labaslietas_green_sync_languages_lv_en')) { labaslietas_green_sync_languages_lv_en(); }
-        if (function_exists('labaslietas_polylang_sync_lv_en_235')) { labaslietas_polylang_sync_lv_en_235(true); }
-        if (function_exists('labaslietas_green_seed_demo_products_lightweight')) { labaslietas_green_seed_demo_products_lightweight(); }
-        labaslietas_sync_menus_234();
-
-        update_option('labaslietas_starter_sync_234', gmdate('c'), false);
-        flush_rewrite_rules(false);
-        return (int)$page_id;
+        if (function_exists('labaslietas_repair_all_300')) { return labaslietas_repair_all_300(); }
+        return new WP_Error('repair_unavailable','Labas Lietas repair layer nav ielādēts.');
     }
 }
 
 require_once get_stylesheet_directory() . '/inc/labaslietas-polylang-yoast.php';
+require_once get_stylesheet_directory() . '/inc/labaslietas-repair-300.php';
+
+
+/* 3.0.3 storefront runtime safeguards. */
+add_filter('woocommerce_coming_soon_exclude', '__return_true', PHP_INT_MAX);
+add_filter('pre_option_woocommerce_coming_soon', function(){ return 'no'; }, PHP_INT_MAX);
+add_filter('pre_option_woocommerce_store_pages_only', function(){ return 'no'; }, PHP_INT_MAX);
+
+add_filter('get_terms', function($terms, $taxonomies, $args, $term_query){
+    if (is_admin() || is_wp_error($terms) || !is_array($terms)) { return $terms; }
+    if (!in_array('product_cat', (array) $taxonomies, true)) { return $terms; }
+    $blocked = array('accessories','apparel','bundles','home-living','office','tech');
+    return array_values(array_filter($terms, function($term) use ($blocked){
+        return !is_object($term) || empty($term->slug) || !in_array($term->slug, $blocked, true);
+    }));
+}, 999, 4);
+
+add_filter('woocommerce_product_query_meta_query', function($meta_query){
+    if (!is_array($meta_query)) { $meta_query = array(); }
+    $meta_query[] = array('key'=>'_sku','value'=>'DEMO-BUSINESS-','compare'=>'NOT LIKE');
+    return $meta_query;
+}, 999);
+
+function labaslietas_runtime_repair_303(){
+    update_option('woocommerce_coming_soon', 'no', false);
+    update_option('woocommerce_store_pages_only', 'no', false);
+    $opts = get_option('labaslietas_theme_options', array());
+    if (!is_array($opts)) { $opts = array(); }
+    $opts['logo_id'] = '';
+    $opts['logo_width'] = '280';
+    $opts['logo_height'] = '110';
+    update_option('labaslietas_theme_options', $opts, false);
+    remove_theme_mod('custom_logo');
+    if (function_exists('wc_delete_product_transients')) { wc_delete_product_transients(); }
+    delete_transient('wc_products_onsale');
+}
+add_action('after_switch_theme', 'labaslietas_runtime_repair_303', 60);
+
+
+/* 3.0.5 final polish layer. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v305-final.php';
+require_once get_stylesheet_directory() . '/inc/labaslietas-v307-layout-fix.php';
+
+/* 3.0.8 critical header/mobile gap hardening. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v308-header-mobile.php';
+
+/* 3.0.9 isolated mobile header + English storefront root. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v309-language-mobile.php';
+
+/* 3.0.10 search UI: clean submit icon + single-row AJAX results. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v310-search.php';
+
+/* 3.0.11 final mobile search/alignment hardening. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v311-mobile-search-alignment.php';
+
+/* 3.0.12 WooCommerce cart / checkout / account presentation helpers. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v312-woocommerce-ui.php';
