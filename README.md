@@ -1,4 +1,4 @@
-# Labas Lietas 3.0.29
+# Labas Lietas 3.0.32
 
 Small targeted storefront update based on v3.0.24.
 
@@ -28,8 +28,27 @@ Do not run Starter Setup or Demo Refresh for this update.
 - Synced homepage stage, benefit strip and product sections to the same 1460px storefront grid.
 - Theme author metadata now points to DigitalPulse.click.
 
+## 3.0.30 mobile header repair
+
+- Forces the mobile search control to use the same green submit button on the homepage and all inner pages.
+- Restores the missing mobile category drawer containment after the 3.0.29 presentation cleanup: hidden by default, positioned below the category button, scrollable, and layered above page content.
+- Adds a late footer guard against legacy/plugin CSS and purges common caches once after upgrade.
+
 ## 3.0.29 stability cleanup
 - Removes the accumulated legacy mobile-header CSS hooks and replaces them with one isolated responsive source of truth.
 - Mobile search is always one row and the four shop actions always stay on one row.
 - Cart/checkout delivery choices fill 100% of the available summary width.
 - Newsletter checkout opt-in is rebranded/translated to Labas Lietas (LV/EN), removing the incorrect WordPress wording.
+
+## 3.0.31 homepage mobile search parity
+- Fixes the remaining homepage-only grey mobile search button.
+- Targets the stable mobile-search markup instead of relying on the newer `ll29-mobile-search` helper class, so older cached homepage markup is also covered.
+- Adds an inline button fallback, late runtime guard, and matching rule in `assets/css/theme.css`.
+- Extends the one-time cache purge to common WordPress page-cache plugins.
+
+
+## 3.0.32 homepage responsive search-box containment
+- Keeps the now-correct green search button fully inside the mobile search box on the homepage.
+- Applies the same 46px outer / 44px inner geometry used by the working inner-page header, including older cached homepage markup that lacks the `ll29-mobile-search` helper class.
+- Scopes the geometry fix to the front page so responsive inner pages are not changed.
+- Adds a late runtime geometry guard and a one-time cache purge for the update.

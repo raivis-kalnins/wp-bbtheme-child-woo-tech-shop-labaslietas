@@ -6,7 +6,7 @@
 defined('ABSPATH') || exit;
 
 if (!defined('LABASLIETAS_GREEN_V2')) {
-    define('LABASLIETAS_GREEN_V2', '3.0.29');
+    define('LABASLIETAS_GREEN_V2', '3.0.30');
 }
 
 function labaslietas_green_icon($name, $class = '') {
@@ -154,7 +154,7 @@ function labaslietas_green_header_html() {
             <form role="search" method="get" class="llg-mobile-search ll29-mobile-search labaslietas-ajax-search" action="<?php echo esc_url($search_action); ?>" autocomplete="off">
                 <div class="llg-mobile-search-cat"><select name="product_cat" aria-label="<?php echo esc_attr($is_en?'Category':'Kategorija'); ?>"><option value=""><?php echo $is_en?'Categories':'Kategorijas'; ?></option><?php if(!is_wp_error($top_categories)): foreach($top_categories as $term): ?><option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html(labaslietas_green_category_label_309($term->name,$term->slug)); ?></option><?php endforeach; endif; ?></select></div>
                 <div class="labaslietas-search-field-wrap llg-mobile-search-field"><input type="search" name="s" placeholder="<?php echo $is_en?'Search products...':'Meklēt preces...'; ?>"><div class="labaslietas-search-results" hidden></div></div>
-                <input type="hidden" name="post_type" value="product"><button class="llg-search-submit" type="submit" aria-label="<?php echo esc_attr($is_en?'Search':'Meklēt'); ?>"><?php echo labaslietas_green_icon('search'); ?></button>
+                <input type="hidden" name="post_type" value="product"><button class="llg-search-submit ll31-mobile-search-submit" type="submit" style="background:#2f9d50!important;background-image:none!important;color:#fff!important;border-color:#278a45!important" aria-label="<?php echo esc_attr($is_en?'Search':'Meklēt'); ?>"><?php echo labaslietas_green_icon('search'); ?></button>
             </form>
             <nav class="llg-mobile-actions ll29-mobile-actions" aria-label="<?php echo esc_attr($is_en?'Shop actions':'Veikala darbības'); ?>">
                 <a href="<?php echo esc_url($account); ?>"><?php echo labaslietas_green_icon('user'); ?><span><?php echo $is_en?'Account':'Konts'; ?></span></a>
