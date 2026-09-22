@@ -629,65 +629,54 @@ body.woocommerce-account .llg-account-auth{display:grid!important;grid-template-
 @media(max-width:720px){body.woocommerce-cart .llg-commerce-shell,body.woocommerce-checkout .llg-commerce-shell,body.woocommerce-account .llg-commerce-shell{padding:22px 0 42px!important}.llg-woo-page,body.woocommerce-account .llg-account-shell>.labaslietas-container{width:calc(100% - 20px)!important}.llg-woo-page-head{align-items:flex-start!important;flex-direction:column!important;gap:12px!important}.llg-woo-page-head h1{font-size:31px!important}.llg-woo-back-link{min-height:38px!important}.llg-cart-card{padding:0 14px 16px!important}.llg-cart-table-head{display:none!important}.llg-cart-item{grid-template-columns:1fr 1fr!important;gap:13px 10px!important;padding:17px 0!important}.llg-cart-product{grid-column:1/-1!important;grid-template-columns:88px minmax(0,1fr)!important;gap:12px!important}.llg-cart-image{width:88px!important;height:88px!important}.llg-cart-price{align-items:flex-start!important;text-align:left!important}.llg-cart-qty{justify-content:flex-end!important}.llg-cart-subtotal{grid-column:1/-1!important;flex-direction:row!important;align-items:baseline!important;justify-content:flex-end!important;border-top:1px dashed #e5eaed!important;padding-top:10px!important}.llg-cart-subtotal:before{content:attr(data-title)!important;margin-right:auto!important;color:#788690!important;font-size:11px!important}.llg-cart-actions{align-items:stretch!important;flex-direction:column!important}.llg-cart-coupon{flex:0 0 auto!important;width:100%!important}.llg-cart-actions .llg-btn-ghost{width:100%!important}.llg-cart-summary-card{padding:18px!important}.labaslietas-mini-cart-panel{width:min(390px,100vw)!important}.llg-checkout-card{padding:18px!important}.llg-checkout-fields .woocommerce-billing-fields__field-wrapper,.llg-checkout-fields .woocommerce-shipping-fields__field-wrapper{grid-template-columns:1fr!important}.llg-checkout-fields .form-row{grid-column:1!important}.llg-myaccount-content-card{padding:18px!important}.llg-dashboard-grid,.llg-myaccount-content-card .woocommerce-Addresses,body.woocommerce-account .llg-account-auth{grid-template-columns:1fr!important}}
 @media(max-width:420px){.llg-mini-cart-item{grid-template-columns:72px minmax(0,1fr) 26px!important}.llg-mini-cart-thumb{width:72px!important;height:72px!important}.llg-mini-cart-buttons{grid-template-columns:1fr!important}.llg-cart-coupon{display:grid!important;grid-template-columns:1fr!important}.llg-cart-coupon input,.llg-cart-coupon .button{width:100%!important}}
 
-/* 3.0.31 mobile search submit parity. Stable selector intentionally avoids versioned ll29 markup. */
-@media(max-width:1049px){
-  #labaslietas-mobile-header form.llg-mobile-search>button[type="submit"],
-  #labaslietas-mobile-header form.llg-mobile-search>.llg-search-submit,
-  #labaslietas-mobile-header form.llg-mobile-search>.ll31-mobile-search-submit{
-    position:relative!important;inset:auto!important;display:grid!important;place-items:center!important;
-    flex:0 0 46px!important;width:46px!important;min-width:46px!important;max-width:46px!important;
-    height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;
-    border:0!important;border-left:1px solid #278a45!important;border-radius:0 8px 8px 0!important;
-    background:#2f9d50!important;background-color:#2f9d50!important;background-image:none!important;color:#fff!important;
-    box-shadow:none!important;text-shadow:none!important;transform:none!important;opacity:1!important;-webkit-appearance:none!important;appearance:none!important;
-  }
-  #labaslietas-mobile-header form.llg-mobile-search>button[type="submit"]:before,
-  #labaslietas-mobile-header form.llg-mobile-search>button[type="submit"]:after{content:none!important;display:none!important}
-  #labaslietas-mobile-header form.llg-mobile-search>button[type="submit"] .labaslietas-green-icon,
-  #labaslietas-mobile-header form.llg-mobile-search>button[type="submit"] svg{
-    position:static!important;display:block!important;width:19px!important;height:19px!important;margin:0!important;
-    color:#fff!important;stroke:currentColor!important;opacity:1!important;visibility:visible!important;transform:none!important;
-  }
-}
-@media(max-width:390px){#labaslietas-mobile-header form.llg-mobile-search>button[type="submit"]{flex-basis:42px!important;width:42px!important;min-width:42px!important;max-width:42px!important}}
-
-/* 3.0.32 homepage responsive search-box containment. */
-@media(max-width:1049px){
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search,
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search{
+/* 3.0.33 final mobile-search geometry + monthly 3Lietas promotion */
+@media (max-width:1049px){
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]{
     box-sizing:border-box!important;position:relative!important;display:flex!important;flex-flow:row nowrap!important;align-items:stretch!important;
     width:calc(100% - 16px)!important;max-width:calc(100% - 16px)!important;height:46px!important;min-height:46px!important;max-height:46px!important;
-    margin:0 8px 8px!important;padding:0!important;border:1px solid #d7e0e5!important;border-radius:9px!important;background:#fff!important;box-shadow:none!important;overflow:visible!important;
+    margin:0 8px 8px!important;padding:0!important;border:1px solid #d7e0e5!important;border-radius:9px!important;background:#fff!important;box-shadow:none!important;
   }
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-cat,
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-cat{
-    box-sizing:border-box!important;position:relative!important;flex:0 0 106px!important;width:106px!important;min-width:0!important;max-width:106px!important;
-    height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;border:0!important;border-right:1px solid #e1e7eb!important;
-    border-radius:8px 0 0 8px!important;background:#f8fafb!important;overflow:hidden!important;
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>.llg-mobile-search-cat{
+    box-sizing:border-box!important;flex:0 0 106px!important;width:106px!important;max-width:106px!important;height:44px!important;min-height:44px!important;max-height:44px!important;
+    margin:0!important;padding:0!important;border:0!important;border-right:1px solid #e1e7eb!important;border-radius:8px 0 0 8px!important;background:#f8fafb!important;overflow:hidden!important;
   }
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-field,
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-field{
-    box-sizing:border-box!important;position:relative!important;display:block!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;max-width:none!important;
-    height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;border:0!important;overflow:visible!important;
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>.llg-mobile-search-field{
+    box-sizing:border-box!important;position:relative!important;display:block!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;
   }
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-field input[type=search],
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-field input[type=search]{
-    box-sizing:border-box!important;position:static!important;display:block!important;width:100%!important;max-width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;
-    margin:0!important;padding:0 10px!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;outline:0!important;line-height:44px!important;transform:none!important;
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>.llg-mobile-search-field input[type=search]{
+    box-sizing:border-box!important;display:block!important;width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0 10px!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;line-height:44px!important;
   }
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>button[type=submit],
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>button[type=submit]{
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>button[type=submit]{
     box-sizing:border-box!important;position:relative!important;inset:auto!important;align-self:flex-start!important;flex:0 0 46px!important;display:grid!important;place-items:center!important;
     width:46px!important;min-width:46px!important;max-width:46px!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;
-    border:0!important;border-left:1px solid #278a45!important;border-radius:0 8px 8px 0!important;background:#2f9d50!important;background-image:none!important;color:#fff!important;
-    box-shadow:none!important;line-height:1!important;text-shadow:none!important;transform:none!important;opacity:1!important;overflow:hidden!important;-webkit-appearance:none!important;appearance:none!important;
+    border:0!important;border-left:1px solid #278a45!important;border-radius:0 8px 8px 0!important;background:#2f9d50!important;background-image:none!important;color:#fff!important;box-shadow:none!important;transform:none!important;overflow:hidden!important;
   }
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>input[type=hidden],
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>input[type=hidden]{display:none!important}
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>button[type=submit]:before,
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>button[type=submit]:after{content:none!important;display:none!important}
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>button[type=submit] .labaslietas-green-icon{
+    position:static!important;display:block!important;width:19px!important;height:19px!important;margin:0!important;color:#fff!important;opacity:1!important;transform:none!important;
+  }
 }
-@media(max-width:390px){
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-cat,
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>.llg-mobile-search-cat{flex-basis:94px!important;width:94px!important;max-width:94px!important}
-  html body.home.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>button[type=submit],
-  html body.page-template-front-page.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search>button[type=submit]{flex-basis:42px!important;width:42px!important;min-width:42px!important;max-width:42px!important}
+@media (max-width:390px){
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>.llg-mobile-search-cat{flex-basis:94px!important;width:94px!important;max-width:94px!important}
+  html body.labaslietas-theme #labaslietas-mobile-header form.llg-mobile-search[data-ll-search-v="3033"]>button[type=submit]{flex-basis:42px!important;width:42px!important;min-width:42px!important;max-width:42px!important}
 }
+
+.ll33-monthly-promo{position:relative;min-width:0;min-height:420px;padding:30px;border-radius:12px;overflow:hidden;background:linear-gradient(120deg,#123f24 0%,#1d5932 58%,#2f7440 100%);color:#fff;box-shadow:var(--ll-shadow)}
+.ll33-monthly-promo:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 88% 5%,rgba(126,231,101,.22),transparent 32%),linear-gradient(135deg,rgba(255,255,255,.04),transparent 45%)}
+.ll33-monthly-head{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:22px;margin-bottom:22px}
+.ll33-monthly-head>div{min-width:0}.ll33-monthly-kicker{display:inline-flex;align-items:center;min-height:28px;padding:0 11px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(10,39,22,.34);font-size:12px;font-weight:850;letter-spacing:.07em;text-transform:uppercase;color:#bff8ad}
+.ll33-monthly-head h1{margin:12px 0 8px;color:#fff;font-size:clamp(30px,3.6vw,48px);line-height:1;letter-spacing:-.035em;font-weight:900}
+.ll33-monthly-head p{max-width:650px;margin:0;color:rgba(255,255,255,.9);font-size:15px;line-height:1.45}
+.ll33-monthly-mark{display:grid;place-items:center;flex:0 0 70px;width:70px;height:70px;border:2px solid rgba(255,255,255,.28);border-radius:18px;background:#78e35f;color:#10381f;font-size:44px;line-height:1;font-weight:950;box-shadow:0 10px 30px rgba(6,33,17,.2)}
+.ll33-monthly-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.ll33-monthly-card{position:relative;min-width:0;overflow:hidden;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:#fff;color:#133047;box-shadow:0 10px 30px rgba(6,31,17,.16)}
+.ll33-monthly-image{display:flex;align-items:center;justify-content:center;height:170px;padding:12px;background:linear-gradient(180deg,#fff,#f5f8f6)}
+.ll33-monthly-image img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.ll33-monthly-copy{position:relative;padding:14px 14px 15px}.ll33-monthly-sale{position:absolute;top:-18px;right:12px;display:inline-flex;align-items:center;justify-content:center;min-width:58px;height:30px;padding:0 9px;border-radius:999px;background:#e12731;color:#fff;font-size:12px;font-weight:900;box-shadow:0 5px 14px rgba(147,18,26,.2)}
+.ll33-monthly-copy h2{margin:0 58px 9px 0;min-height:42px;font-size:14px;line-height:1.3;font-weight:850}.ll33-monthly-copy h2 a{color:#133047;text-decoration:none}.ll33-monthly-copy h2 a:hover{color:#237e40}
+.ll33-monthly-price{min-height:30px;font-size:18px;font-weight:900;color:#1f7f3e}.ll33-monthly-price del{margin-right:5px;color:#7b8993;font-size:13px;font-weight:600}.ll33-monthly-price ins{text-decoration:none;color:#1f7f3e}
+.ll33-monthly-link{display:inline-flex;align-items:center;gap:5px;margin-top:7px;color:#173f2a;font-size:12px;font-weight:850;text-decoration:none}.ll33-monthly-link .labaslietas-green-icon{width:15px;height:15px}.ll33-monthly-link:hover{color:#258243}
+@media (max-width:980px){.ll33-monthly-promo{min-height:380px;padding:24px}.ll33-monthly-image{height:145px}.ll33-monthly-copy{padding:12px}.ll33-monthly-copy h2{font-size:12px;min-height:40px}}
+@media (max-width:720px){.ll33-monthly-promo{min-height:0;padding:20px}.ll33-monthly-head{margin-bottom:16px}.ll33-monthly-head h1{font-size:32px}.ll33-monthly-mark{flex-basis:56px;width:56px;height:56px;border-radius:14px;font-size:34px}.ll33-monthly-grid{gap:9px}.ll33-monthly-image{height:128px;padding:8px}.ll33-monthly-copy{padding:9px}.ll33-monthly-sale{top:-16px;right:7px;min-width:48px;height:26px;padding:0 6px;font-size:10px}.ll33-monthly-copy h2{margin-right:43px;min-height:36px;font-size:11px}.ll33-monthly-price{font-size:15px}.ll33-monthly-price del{display:block;margin:0;font-size:10px}.ll33-monthly-link{font-size:10px}}
+@media (max-width:430px){.ll33-monthly-promo{padding:14px}.ll33-monthly-head{gap:10px}.ll33-monthly-kicker{min-height:24px;padding:0 8px;font-size:9px}.ll33-monthly-head h1{margin-top:8px;font-size:24px}.ll33-monthly-head p{font-size:11px}.ll33-monthly-mark{flex-basis:44px;width:44px;height:44px;border-radius:11px;font-size:27px}.ll33-monthly-grid{gap:6px}.ll33-monthly-image{height:92px;padding:5px}.ll33-monthly-copy{padding:7px}.ll33-monthly-sale{top:-13px;right:5px;min-width:40px;height:22px;font-size:9px}.ll33-monthly-copy h2{margin-right:0;min-height:43px;font-size:9px;line-height:1.25}.ll33-monthly-price{min-height:25px;font-size:12px}.ll33-monthly-price del{font-size:8px}.ll33-monthly-link{display:none}}

@@ -1733,8 +1733,5 @@ require_once get_stylesheet_directory() . '/inc/labaslietas-v329-stability.php';
 /* 3.0.30 mobile header parity + contained category drawer. */
 require_once get_stylesheet_directory() . '/inc/labaslietas-v330-mobile-header-fix.php';
 
-/* 3.0.31 homepage mobile search-button hardening. */
-require_once get_stylesheet_directory() . '/inc/labaslietas-v331-home-mobile-search.php';
-
-/* 3.0.32 homepage responsive search-box containment. */
-require_once get_stylesheet_directory() . '/inc/labaslietas-v332-home-mobile-search-containment.php';
+/* 3.0.33 monthly homepage picks + final mobile search/cache hardening. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v333-monthly-picks.php';

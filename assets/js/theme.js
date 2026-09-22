@@ -945,3 +945,99 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('load',cleanTemplateParts);
   setTimeout(cleanTemplateParts,500);
 })();
+
+/* 3.0.33: final mobile search geometry guard, including cached front-page markup. */
+(function () {
+  'use strict';
+  function ll3033FixMobileSearch() {
+    if (!window.matchMedia || !window.matchMedia('(max-width:1049px)').matches) { return; }
+    var form = document.querySelector('#labaslietas-mobile-header form.llg-mobile-search');
+    if (!form) { return; }
+    var cat = form.querySelector('.llg-mobile-search-cat');
+    var field = form.querySelector('.llg-mobile-search-field');
+    var input = field ? field.querySelector('input[type="search"]') : null;
+    var button = form.querySelector('button[type="submit"]');
+    var narrow = window.matchMedia('(max-width:390px)').matches;
+    var catWidth = narrow ? '94px' : '106px';
+    var buttonWidth = narrow ? '42px' : '46px';
+
+    form.style.setProperty('box-sizing', 'border-box', 'important');
+    form.style.setProperty('position', 'relative', 'important');
+    form.style.setProperty('display', 'flex', 'important');
+    form.style.setProperty('flex-flow', 'row nowrap', 'important');
+    form.style.setProperty('align-items', 'stretch', 'important');
+    form.style.setProperty('width', 'calc(100% - 16px)', 'important');
+    form.style.setProperty('max-width', 'calc(100% - 16px)', 'important');
+    form.style.setProperty('height', '46px', 'important');
+    form.style.setProperty('min-height', '46px', 'important');
+    form.style.setProperty('max-height', '46px', 'important');
+    form.style.setProperty('margin', '0 8px 8px', 'important');
+    form.style.setProperty('padding', '0', 'important');
+    form.style.setProperty('border', '1px solid #d7e0e5', 'important');
+    form.style.setProperty('border-radius', '9px', 'important');
+    form.style.setProperty('background', '#fff', 'important');
+
+    if (cat) {
+      cat.style.setProperty('box-sizing', 'border-box', 'important');
+      cat.style.setProperty('flex', '0 0 ' + catWidth, 'important');
+      cat.style.setProperty('width', catWidth, 'important');
+      cat.style.setProperty('max-width', catWidth, 'important');
+      cat.style.setProperty('height', '44px', 'important');
+      cat.style.setProperty('min-height', '44px', 'important');
+      cat.style.setProperty('max-height', '44px', 'important');
+    }
+    if (field) {
+      field.style.setProperty('box-sizing', 'border-box', 'important');
+      field.style.setProperty('display', 'block', 'important');
+      field.style.setProperty('flex', '1 1 auto', 'important');
+      field.style.setProperty('width', 'auto', 'important');
+      field.style.setProperty('min-width', '0', 'important');
+      field.style.setProperty('height', '44px', 'important');
+      field.style.setProperty('min-height', '44px', 'important');
+      field.style.setProperty('max-height', '44px', 'important');
+    }
+    if (input) {
+      input.style.setProperty('box-sizing', 'border-box', 'important');
+      input.style.setProperty('display', 'block', 'important');
+      input.style.setProperty('width', '100%', 'important');
+      input.style.setProperty('height', '44px', 'important');
+      input.style.setProperty('min-height', '44px', 'important');
+      input.style.setProperty('max-height', '44px', 'important');
+      input.style.setProperty('margin', '0', 'important');
+      input.style.setProperty('padding', '0 10px', 'important');
+    }
+    if (button) {
+      button.style.setProperty('box-sizing', 'border-box', 'important');
+      button.style.setProperty('position', 'relative', 'important');
+      button.style.setProperty('inset', 'auto', 'important');
+      button.style.setProperty('align-self', 'flex-start', 'important');
+      button.style.setProperty('flex', '0 0 ' + buttonWidth, 'important');
+      button.style.setProperty('display', 'grid', 'important');
+      button.style.setProperty('place-items', 'center', 'important');
+      button.style.setProperty('width', buttonWidth, 'important');
+      button.style.setProperty('min-width', buttonWidth, 'important');
+      button.style.setProperty('max-width', buttonWidth, 'important');
+      button.style.setProperty('height', '44px', 'important');
+      button.style.setProperty('min-height', '44px', 'important');
+      button.style.setProperty('max-height', '44px', 'important');
+      button.style.setProperty('margin', '0', 'important');
+      button.style.setProperty('padding', '0', 'important');
+      button.style.setProperty('border', '0', 'important');
+      button.style.setProperty('border-left', '1px solid #278a45', 'important');
+      button.style.setProperty('border-radius', '0 8px 8px 0', 'important');
+      button.style.setProperty('background', '#2f9d50', 'important');
+      button.style.setProperty('background-image', 'none', 'important');
+      button.style.setProperty('color', '#fff', 'important');
+      button.style.setProperty('box-shadow', 'none', 'important');
+      button.style.setProperty('transform', 'none', 'important');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ll3033FixMobileSearch, { once: true });
+  } else {
+    ll3033FixMobileSearch();
+  }
+  window.addEventListener('pageshow', ll3033FixMobileSearch);
+  window.addEventListener('resize', ll3033FixMobileSearch);
+}());

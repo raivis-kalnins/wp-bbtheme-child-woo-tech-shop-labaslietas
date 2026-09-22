@@ -1,4 +1,15 @@
-# Labas Lietas 3.0.32
+# Labas Lietas 3.0.33
+
+## 3.0.33 homepage search + monthly 3Lietas promotion
+
+- Rebuilds the mobile search geometry directly in the shared header markup so the homepage cannot render a taller/wider submit button than inner pages.
+- Adds a version marker (`data-ll-search-v="3033"`) and matching final CSS guard for the 46px search shell / 44px controls.
+- Replaces the homepage seasonal advert with a monthly `3Lietas <month> iesaka` panel when the configured month is active.
+- The monthly panel shows three discounted WooCommerce products with image, product name, old/new price and discount badge.
+- Initial September picks prefer the currently discounted H10 trimmer head, G3500 generator and A1500 impact wrench when those SKUs exist. Otherwise the module fills from active sale products.
+- Monthly promotion management is available in **Appearance -> 3Lietas mēneša piedāvājums**: enable/disable, choose month, optional custom title and choose three products.
+- The promotion automatically disappears outside the configured month. Product sale prices and sale date ranges remain managed in the normal WooCommerce product editor.
+- Includes one-time common cache purging after upgrade.
 
 Small targeted storefront update based on v3.0.24.
 
