@@ -10,7 +10,7 @@ $sidebar_html = $sidebar_enabled && function_exists('labaslietas_wc_archive_side
 $show_sidebar = $sidebar_enabled && $sidebar_html !== '';
 ?>
 <main class="labaslietas-archive-page labaslietas-archive-v27 llg-archive-page">
-    <div class="labaslietas-container container">
+    <div class="labaslietas-container">
         <?php woocommerce_output_all_notices(); ?>
         <section class="labaslietas-archive-hero llg-archive-hero card border-0 shadow-sm">
             <div>
@@ -25,14 +25,14 @@ $show_sidebar = $sidebar_enabled && $sidebar_html !== '';
             </div>
         </section>
 
-        <div class="labaslietas-archive-layout row g-4 align-items-start <?php echo $show_sidebar ? '' : 'labaslietas-no-sidebar'; ?>">
+        <div class="labaslietas-archive-layout <?php echo $show_sidebar ? '' : 'labaslietas-no-sidebar'; ?>">
             <?php if ($show_sidebar) : ?>
-            <aside class="col-12 col-lg-3 labaslietas-archive-filter-col">
+            <aside class="labaslietas-archive-filter-col">
                 <?php echo $sidebar_html; ?>
             </aside>
             <?php endif; ?>
 
-            <section class="col-12 <?php echo $show_sidebar ? 'col-lg-9' : 'col-lg-12'; ?> labaslietas-archive-products-col">
+            <section class="labaslietas-archive-products-col">
                 <div class="labaslietas-archive-toolbar card border-0 shadow-sm d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
                     <div class="labaslietas-result-count"><?php woocommerce_result_count(); ?></div>
                     <div class="labaslietas-ordering"><?php woocommerce_catalog_ordering(); ?></div>

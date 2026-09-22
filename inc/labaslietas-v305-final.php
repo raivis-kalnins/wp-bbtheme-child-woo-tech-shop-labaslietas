@@ -25,6 +25,10 @@ add_action('pre_get_posts', function($query) {
 
 function labaslietas_v305_demo_image_url($product) {
     if (!$product || !is_a($product, 'WC_Product')) { return ''; }
+    if (function_exists('labaslietas_v315_demo_asset_url')) {
+        $forced_demo = labaslietas_v315_demo_asset_url($product);
+        if ($forced_demo) { return $forced_demo; }
+    }
     $image_id = $product->get_image_id();
     if ($image_id) {
         $url = wp_get_attachment_image_url($image_id, 'woocommerce_thumbnail');

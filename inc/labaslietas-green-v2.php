@@ -6,7 +6,7 @@
 defined('ABSPATH') || exit;
 
 if (!defined('LABASLIETAS_GREEN_V2')) {
-    define('LABASLIETAS_GREEN_V2', '3.0.12');
+    define('LABASLIETAS_GREEN_V2', '3.0.29');
 }
 
 function labaslietas_green_icon($name, $class = '') {
@@ -86,8 +86,8 @@ function labaslietas_green_header_html() {
     $compare_count = function_exists('labaslietas_get_list_items') ? count(labaslietas_get_list_items('compare')) : 0;
     $facebook = labaslietas_get_theme_option('social_facebook', 'https://www.facebook.com/labas.lietas.33');
     $instagram = labaslietas_get_theme_option('social_instagram', '#');
-    $phone = trim((string) labaslietas_get_theme_option('phone', '+371 29 123 456'));
-    $email = trim((string) labaslietas_get_theme_option('email', 'info@labaslietas.63.lv'));
+    $phone = trim((string) labaslietas_get_theme_option('phone', ''));
+    $email = trim((string) labaslietas_get_theme_option('email', ''));
     $is_en = function_exists('labaslietas_v305_is_english') ? labaslietas_v305_is_english() : false;
     $home = $is_en ? home_url('/en/') : home_url('/');
     $search_action = $home;
@@ -124,21 +124,21 @@ function labaslietas_green_header_html() {
                     </div>
                 </div>
             </div>
-            <div class="labaslietas-container llg-mainbar llg-mainbar-preview">
-                <div class="llg-logo"><?php echo labaslietas_logo_html(); ?></div>
-                <div class="llg-search-column">
-                    <form role="search" method="get" class="llg-search llg-search-extended labaslietas-ajax-search" action="<?php echo esc_url($search_action); ?>" autocomplete="off">
-                        <div class="llg-search-select-wrap"><select name="product_cat" aria-label="<?php echo esc_attr($is_en?'Category':'Kategorija'); ?>"><option value=""><?php echo $is_en ? 'All categories' : 'Visas kategorijas'; ?></option><?php if (!is_wp_error($top_categories)) : foreach ($top_categories as $term) : ?><option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html(labaslietas_green_category_label_309($term->name,$term->slug)); ?></option><?php endforeach; endif; ?></select></div>
-                        <div class="labaslietas-search-field-wrap llg-search-field-wrap"><input type="search" name="s" placeholder="<?php echo $is_en ? 'Search product, brand, SKU...' : 'Meklēt preci, ražotāju, SKU...'; ?>" value="<?php echo esc_attr(get_search_query()); ?>"><div class="labaslietas-search-results" hidden></div></div>
-                        <input type="hidden" name="post_type" value="product"><button class="llg-search-submit" type="submit" aria-label="<?php echo esc_attr($is_en?'Search':'Meklēt'); ?>"><?php echo labaslietas_green_icon('search'); ?></button>
+            <div id="labaslietas-desktop-mainbar" class="labaslietas-container ll24-mainbar">
+                <div class="ll24-logo"><?php echo labaslietas_logo_html(); ?></div>
+                <div class="ll24-search-area">
+                    <form role="search" method="get" class="ll24-search-form labaslietas-ajax-search" action="<?php echo esc_url($search_action); ?>" autocomplete="off">
+                        <div class="ll24-search-category"><select name="product_cat" aria-label="<?php echo esc_attr($is_en?'Category':'Kategorija'); ?>"><option value=""><?php echo $is_en ? 'All categories' : 'Visas kategorijas'; ?></option><?php if (!is_wp_error($top_categories)) : foreach ($top_categories as $term) : ?><option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html(labaslietas_green_category_label_309($term->name,$term->slug)); ?></option><?php endforeach; endif; ?></select></div>
+                        <div class="labaslietas-search-field-wrap ll24-search-field"><input type="search" name="s" placeholder="<?php echo $is_en ? 'Search product, brand, SKU...' : 'Meklēt preci, ražotāju, SKU...'; ?>" value="<?php echo esc_attr(get_search_query()); ?>"><div class="labaslietas-search-results" hidden></div></div>
+                        <input type="hidden" name="post_type" value="product"><button class="ll24-search-button" type="submit" aria-label="<?php echo esc_attr($is_en?'Search':'Meklēt'); ?>"><?php echo labaslietas_green_icon('search'); ?></button>
                     </form>
-                    <div class="llg-popular-searches"><strong><?php echo $is_en ? 'Popular searches:' : 'Populāri meklējumi:'; ?></strong><?php foreach ($keywords as $kw) : ?><a href="<?php echo esc_url(add_query_arg(array('s'=>$kw,'post_type'=>'product'),$search_action)); ?>"><?php echo esc_html($kw); ?></a><?php endforeach; ?></div>
+                    <div class="ll24-popular"><strong><?php echo $is_en ? 'Popular searches:' : 'Populāri meklējumi:'; ?></strong><?php foreach ($keywords as $kw) : ?><a href="<?php echo esc_url(add_query_arg(array('s'=>$kw,'post_type'=>'product'),$search_action)); ?>"><?php echo esc_html($kw); ?></a><?php endforeach; ?></div>
                 </div>
-                <nav class="llg-actions" aria-label="<?php echo esc_attr($is_en?'Shop actions':'Veikala darbības'); ?>">
+                <nav class="ll24-actions" aria-label="<?php echo esc_attr($is_en?'Shop actions':'Veikala darbības'); ?>">
                     <a href="<?php echo esc_url($account); ?>"><?php echo labaslietas_green_icon('user'); ?><span><?php echo $is_en ? 'Account' : 'Konts'; ?></span></a>
                     <a href="<?php echo esc_url($wishlist_url); ?>"><?php echo labaslietas_green_icon('heart'); ?><span><?php echo $is_en ? 'Wishlist' : 'Vēlmes'; ?></span><em class="labaslietas-wishlist-count"><?php echo (int)$wishlist_count; ?></em></a>
                     <a href="<?php echo esc_url($compare_url); ?>"><?php echo labaslietas_green_icon('compare'); ?><span><?php echo $is_en ? 'Compare' : 'Salīdzināt'; ?></span><em class="labaslietas-compare-count"><?php echo (int)$compare_count; ?></em></a>
-                    <button class="llg-cart labaslietas-mini-cart-toggle" type="button" aria-controls="labaslietas-mini-cart-panel" aria-expanded="false"><?php echo labaslietas_green_icon('cart'); ?><span><?php echo $is_en ? 'Cart' : 'Grozs'; ?></span><em class="labaslietas-cart-count"><?php echo (int)$cart_count; ?></em><strong class="labaslietas-cart-total"><?php echo wp_kses_post($cart_total); ?></strong></button>
+                    <button class="ll24-cart labaslietas-mini-cart-toggle" type="button" aria-controls="labaslietas-mini-cart-panel" aria-expanded="false"><?php echo labaslietas_green_icon('cart'); ?><span><?php echo $is_en ? 'Cart' : 'Grozs'; ?></span><em class="labaslietas-cart-count"><?php echo (int)$cart_count; ?></em><strong class="labaslietas-cart-total"><?php echo wp_kses_post($cart_total); ?></strong></button>
                 </nav>
             </div>
             <div class="llg-nav-row"><div class="labaslietas-container llg-nav-inner llg-nav-inner-preview">
@@ -148,21 +148,21 @@ function labaslietas_green_header_html() {
             </div></div>
         </div>
 
-        <div class="llg-mobile-shell">
+        <div id="labaslietas-mobile-header" class="llg-mobile-shell ll29-mobile-shell">
             <div class="llg-mobile-top"><span><?php echo labaslietas_green_icon('location'); ?> Smiltene, LV-4729</span><?php echo labaslietas_green_language_switcher_234(); ?></div>
             <div class="llg-mobile-brand"><?php echo labaslietas_logo_html(); ?></div>
-            <form role="search" method="get" class="llg-mobile-search labaslietas-ajax-search" action="<?php echo esc_url($search_action); ?>" autocomplete="off">
+            <form role="search" method="get" class="llg-mobile-search ll29-mobile-search labaslietas-ajax-search" action="<?php echo esc_url($search_action); ?>" autocomplete="off">
                 <div class="llg-mobile-search-cat"><select name="product_cat" aria-label="<?php echo esc_attr($is_en?'Category':'Kategorija'); ?>"><option value=""><?php echo $is_en?'Categories':'Kategorijas'; ?></option><?php if(!is_wp_error($top_categories)): foreach($top_categories as $term): ?><option value="<?php echo esc_attr($term->slug); ?>"><?php echo esc_html(labaslietas_green_category_label_309($term->name,$term->slug)); ?></option><?php endforeach; endif; ?></select></div>
                 <div class="labaslietas-search-field-wrap llg-mobile-search-field"><input type="search" name="s" placeholder="<?php echo $is_en?'Search products...':'Meklēt preces...'; ?>"><div class="labaslietas-search-results" hidden></div></div>
                 <input type="hidden" name="post_type" value="product"><button class="llg-search-submit" type="submit" aria-label="<?php echo esc_attr($is_en?'Search':'Meklēt'); ?>"><?php echo labaslietas_green_icon('search'); ?></button>
             </form>
-            <nav class="llg-mobile-actions" aria-label="<?php echo esc_attr($is_en?'Shop actions':'Veikala darbības'); ?>">
+            <nav class="llg-mobile-actions ll29-mobile-actions" aria-label="<?php echo esc_attr($is_en?'Shop actions':'Veikala darbības'); ?>">
                 <a href="<?php echo esc_url($account); ?>"><?php echo labaslietas_green_icon('user'); ?><span><?php echo $is_en?'Account':'Konts'; ?></span></a>
                 <a href="<?php echo esc_url($wishlist_url); ?>"><?php echo labaslietas_green_icon('heart'); ?><span><?php echo $is_en?'Wishlist':'Vēlmes'; ?></span><em><?php echo (int)$wishlist_count; ?></em></a>
                 <a href="<?php echo esc_url($compare_url); ?>"><?php echo labaslietas_green_icon('compare'); ?><span><?php echo $is_en?'Compare':'Salīdzināt'; ?></span><em><?php echo (int)$compare_count; ?></em></a>
                 <button class="labaslietas-mini-cart-toggle" type="button" aria-controls="labaslietas-mini-cart-panel" aria-expanded="false"><?php echo labaslietas_green_icon('cart'); ?><span><?php echo $is_en?'Cart':'Grozs'; ?></span><em><?php echo (int)$cart_count; ?></em></button>
             </nav>
-            <div class="llg-mobile-navbar">
+            <div class="llg-mobile-navbar ll29-mobile-navbar">
                 <div class="llg-mobile-catalog-wrap"><button class="llg-mobile-catalog-button" type="button" aria-expanded="false"><?php echo labaslietas_green_icon('menu'); ?><span><?php echo $is_en?'Categories':'Visas kategorijas'; ?></span></button><div class="llg-mobile-catalog-menu"><?php echo $category_links; ?></div></div>
                 <button class="llg-mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="llg-mobile-menu-panel"><?php echo labaslietas_green_icon('menu'); ?><span><?php echo $is_en?'Menu':'Izvēlne'; ?></span></button>
             </div>
@@ -344,8 +344,8 @@ function labaslietas_green_home_shortcode() {
 
 function labaslietas_green_footer_html() {
     $facebook=labaslietas_get_theme_option('social_facebook','https://www.facebook.com/labas.lietas.33');
-    $phone=trim((string)labaslietas_get_theme_option('phone','+371 29 123 456'));
-    $email=trim((string)labaslietas_get_theme_option('email','info@labaslietas.63.lv'));
+    $phone=trim((string)labaslietas_get_theme_option('phone',''));
+    $email=trim((string)labaslietas_get_theme_option('email',''));
     $hours=trim((string)labaslietas_get_theme_option('work_hours','P.-Pk. 9:00 - 18:00 / S. 9:00 - 14:00'));
     $address='Smiltene, Latvija, LV-4729';
     $is_en=function_exists('labaslietas_v305_is_english')&&labaslietas_v305_is_english();

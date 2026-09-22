@@ -209,6 +209,10 @@ function labaslietas_compare_feed_color($product) {
 }
 
 function labaslietas_compare_feed_is_used($product) {
+    // Comparison services require demo/display items to be marked as used/demo when such products are intentionally included.
+    if (get_post_meta($product->get_id(), '_labaslietas_demo_product', true) === '1') {
+        return true;
+    }
     $override = get_post_meta($product->get_id(), '_labaslietas_feed_used', true);
     if ($override === 'yes') {
         return true;
@@ -289,6 +293,10 @@ function labaslietas_compare_feed_category_data($product_id) {
 }
 
 function labaslietas_compare_feed_image($product) {
+    if (function_exists('labaslietas_v315_demo_asset_url')) {
+        $demo_url = labaslietas_v315_demo_asset_url($product);
+        if ($demo_url) { return (string) $demo_url; }
+    }
     $image_id = $product->get_image_id();
     if (!$image_id && $product->is_type('variable')) {
         $priced_product = labaslietas_compare_feed_product_for_price($product);
@@ -296,7 +304,16 @@ function labaslietas_compare_feed_image($product) {
             $image_id = $priced_product->get_image_id();
         }
     }
-    return $image_id ? (string) wp_get_attachment_image_url($image_id, 'full') : '';
+    if ($image_id) {
+        $url = wp_get_attachment_image_url($image_id, 'full');
+        if ($url) { return (string) $url; }
+    }
+    // Demo/catalogue products may intentionally use theme-bundled imagery instead of Media Library attachments.
+    if (function_exists('labaslietas_v305_demo_image_url')) {
+        $url = labaslietas_v305_demo_image_url($product);
+        if ($url) { return (string) $url; }
+    }
+    return '';
 }
 
 function labaslietas_compare_feed_stock_quantity($product) {
@@ -325,6 +342,10 @@ function labaslietas_compare_feed_product_data($product) {
         return false;
     }
     if (get_post_meta($product->get_id(), '_labaslietas_feed_exclude', true) === 'yes') {
+        return false;
+    }
+    $sku = (string) $product->get_sku();
+    if ($sku !== '' && strpos($sku, 'DEMO-BUSINESS-') === 0) {
         return false;
     }
     if (!$product->is_visible() || !$product->is_purchasable()) {

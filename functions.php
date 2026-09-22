@@ -1129,7 +1129,7 @@ function labaslietas_render_single_product_section($product_id, $mode = 'related
     echo '<section class="labaslietas-single-products-section labaslietas-single-' . esc_attr($mode) . ' card border-0 shadow-sm mx-auto mt-4">';
     echo '<div class="labaslietas-section-head"><h2>' . esc_html($title) . '</h2></div>';
     echo '<div class="labaslietas-product-grid labaslietas-single-products-grid" style="--labaslietas-cols:' . esc_attr($columns) . '">';
-    while ($q->have_posts()) { $q->the_post(); global $product; if ($product) { echo labaslietas_product_card($product); } }
+    while ($q->have_posts()) { $q->the_post(); global $product; if ($product) { echo function_exists('labaslietas_green_product_card') ? labaslietas_green_product_card($product) : labaslietas_product_card($product); } }
     echo '</div></section>';
     wp_reset_postdata();
 }
@@ -1419,6 +1419,21 @@ if (!function_exists('labaslietas_v38_gallery_items')) {
     function labaslietas_v38_gallery_items($product) {
         $items = array();
         if (!$product || !is_a($product, 'WC_Product')) { return $items; }
+        $demo_map = array(
+            'LL-DEMO-D20'=>'drill.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder.png','LL-DEMO-G3500'=>'generator.png',
+            'LL-DEMO-J3T'=>'jack.png','LL-DEMO-A1500'=>'impact-wrench.png','LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower.png',
+            'LL-DEMO-BC52'=>'brushcutter.png','LL-DEMO-H10'=>'trimmer-head.png','LL-DEMO-HALU'=>'aluminum-head.png','LL-DEMO-L24'=>'trimmer-line.png',
+            'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png'
+        );
+        $sku = (string) $product->get_sku();
+        // Demo products must use the bundled asset by SKU. Older demo imports may have stale/wrong attachment IDs.
+        if (get_post_meta($product->get_id(), '_labaslietas_demo_product', true) === '1' && !empty($demo_map[$sku])) {
+            $path = get_stylesheet_directory() . '/assets/demo-products/' . $demo_map[$sku];
+            if (file_exists($path)) {
+                $url = get_stylesheet_directory_uri() . '/assets/demo-products/' . $demo_map[$sku];
+                return array(array('thumb'=>$url, 'main'=>$url, 'full'=>$url, 'alt'=>$product->get_name()));
+            }
+        }
         $ids = array();
         $main_id = $product->get_image_id();
         if ($main_id) { $ids[] = $main_id; }
@@ -1427,13 +1442,6 @@ if (!function_exists('labaslietas_v38_gallery_items')) {
             if ($gid && !in_array($gid, $ids, true)) { $ids[] = $gid; }
         }
         if (empty($ids)) {
-            $demo_map = array(
-                'LL-DEMO-D20'=>'drill.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder.png','LL-DEMO-G3500'=>'generator.png',
-                'LL-DEMO-J3T'=>'jack.png','LL-DEMO-A1500'=>'impact-wrench.png','LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower.png',
-                'LL-DEMO-BC52'=>'brushcutter.png','LL-DEMO-H10'=>'trimmer-head.png','LL-DEMO-HALU'=>'aluminum-head.png','LL-DEMO-L24'=>'trimmer-line.png',
-                'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png'
-            );
-            $sku = (string)$product->get_sku();
             if (!empty($demo_map[$sku])) {
                 $path = get_stylesheet_directory() . '/assets/demo-products/' . $demo_map[$sku];
                 if (file_exists($path)) {
@@ -1685,3 +1693,39 @@ require_once get_stylesheet_directory() . '/inc/labaslietas-v311-mobile-search-a
 
 /* 3.0.12 WooCommerce cart / checkout / account presentation helpers. */
 require_once get_stylesheet_directory() . '/inc/labaslietas-v312-woocommerce-ui.php';
+
+/* 3.0.13 site-wide content/product/archive/feed/quote hardening. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v313-sitewide.php';
+
+/* 3.0.14 centered info/account pages, product gallery/lightbox and direct XML feed hardening. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v314-site-polish.php';
+
+/* 3.0.15 unified site width, compact header/hero alignment and static XML feeds. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v315-wide-header-feeds.php';
+
+/* 3.0.16 product quantity/gallery, mini-cart, shipping width and homepage search polish. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v316-product-cart-polish.php';
+
+/* 3.0.17 My Account password controls + consistent contained header search. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v317-account-search-fix.php';
+
+/* 3.0.21 isolated responsive header rebuild. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v321-header-rebuild.php';
+
+/* 3.0.23 one header geometry everywhere; cache purge only, no homepage-specific CSS. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v323-header-unify.php';
+
+/* 3.0.24 isolated desktop header namespace; prevents front-page legacy CSS conflicts. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v324-home-header-isolation.php';
+
+/* Legacy quote-label helper; homepage-only topbar CSS removed in 3.0.28. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v326-topbar-grid.php';
+
+/* 3.0.27 final responsive/mobile header geometry. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v327-responsive-header.php';
+
+/* 3.0.28 one site-wide grid for topbar, header, nav and homepage sections. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v328-grid-clean.php';
+
+/* 3.0.29 single responsive header source + checkout shipping/newsletter polish. */
+require_once get_stylesheet_directory() . '/inc/labaslietas-v329-stability.php';
