@@ -1,4 +1,12 @@
-# Labas Lietas 3.0.33
+# Labas Lietas 3.0.34
+
+## 3.0.34 monthly picks visual polish
+
+- Public heading now uses `3 Lietas <month> iesaka` with the requested space after `3`, including normalization of an older saved `3Lietas ...` custom title.
+- Removes the large decorative `3` from the right side of the monthly promotion header.
+- Refreshes the three promotion cards with larger product imagery, cleaner spacing, softer borders/shadows and a clearer product CTA.
+- On phones, the three products now become readable horizontal cards stacked one per row instead of three tiny compressed columns.
+- Bumps cache-busting theme version to 3.0.34 and re-runs the one-time common cache purge.
 
 ## 3.0.33 homepage search + monthly 3Lietas promotion
 

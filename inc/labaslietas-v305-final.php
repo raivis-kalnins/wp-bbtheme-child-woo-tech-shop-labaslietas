@@ -35,11 +35,11 @@ function labaslietas_v305_demo_image_url($product) {
         if ($url) { return $url; }
     }
     $map = array(
-        'LL-DEMO-D20'=>'drill.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder.png',
-        'LL-DEMO-G3500'=>'generator.png','LL-DEMO-J3T'=>'jack.png','LL-DEMO-A1500'=>'impact-wrench.png',
-        'LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower.png','LL-DEMO-BC52'=>'brushcutter.png',
-        'LL-DEMO-H10'=>'trimmer-head.png','LL-DEMO-HALU'=>'aluminum-head.png','LL-DEMO-L24'=>'trimmer-line.png',
-        'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png',
+        'LL-DEMO-D20'=>'drill-v46.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder-v43-v46.png',
+        'LL-DEMO-G3500'=>'generator.png','LL-DEMO-J3T'=>'jack-v43-v46.png','LL-DEMO-A1500'=>'impact-wrench.png',
+        'LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower-v45-v46.png','LL-DEMO-BC52'=>'brushcutter.png',
+        'LL-DEMO-H10'=>'trimmer-head-v43-v46.png','LL-DEMO-HALU'=>'aluminum-head-v45-v46.png','LL-DEMO-L24'=>'trimmer-line-v45-v46.png',
+        'LL-DEMO-CS85'=>'chain-sharpener-v43-v46.png','LL-DEMO-OP12'=>'oil-pump-v43-v46.png',
     );
     $sku = (string) $product->get_sku();
     if (!empty($map[$sku])) {

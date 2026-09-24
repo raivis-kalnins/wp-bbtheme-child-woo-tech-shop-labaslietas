@@ -535,7 +535,7 @@ function labaslietas_products_shortcode($atts) {
     $q = new WP_Query($args);
     ob_start(); ?>
     <section class="labaslietas-products-section <?php echo esc_attr($atts['class']); ?>" style="--labaslietas-cols:<?php echo (int)$atts['columns']; ?>">
-      <?php if($atts['title']): ?><div class="labaslietas-section-head"><h2><?php echo esc_html($atts['title']); ?></h2><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Skatīt visus →</a></div><?php endif; ?>
+      <?php if($atts['title']): ?><div class="labaslietas-section-head"><h2><?php echo esc_html($atts['title']); ?></h2><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><span class="llg-section-link-text">Skatīt visus</span><span class="llg-section-link-icon">›</span></a></div><?php endif; ?>
       <div class="labaslietas-product-grid">
       <?php while($q->have_posts()): $q->the_post(); global $product; echo labaslietas_product_card($product); endwhile; wp_reset_postdata(); ?>
       </div>
@@ -1426,12 +1426,19 @@ if (!function_exists('labaslietas_v38_gallery_items')) {
             'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png'
         );
         $sku = (string) $product->get_sku();
-        // Demo products must use the bundled asset by SKU. Older demo imports may have stale/wrong attachment IDs.
-        if (get_post_meta($product->get_id(), '_labaslietas_demo_product', true) === '1' && !empty($demo_map[$sku])) {
-            $path = get_stylesheet_directory() . '/assets/demo-products/' . $demo_map[$sku];
-            if (file_exists($path)) {
-                $url = get_stylesheet_directory_uri() . '/assets/demo-products/' . $demo_map[$sku];
-                return array(array('thumb'=>$url, 'main'=>$url, 'full'=>$url, 'alt'=>$product->get_name()));
+        // Demo products use the bundled image set, including any realistic demo gallery files.
+        if (get_post_meta($product->get_id(), '_labaslietas_demo_product', true) === '1' && function_exists('labaslietas_green_demo_item_by_sku')) {
+            $item = labaslietas_green_demo_item_by_sku($sku);
+            if ($item && !empty($item['image'])) {
+                $files = array_merge(array($item['image']), (array) (isset($item['gallery']) ? $item['gallery'] : array()));
+                foreach ($files as $file) {
+                    $file = basename($file);
+                    $path = get_stylesheet_directory() . '/assets/demo-products/' . $file;
+                    if (!file_exists($path)) { continue; }
+                    $url = get_stylesheet_directory_uri() . '/assets/demo-products/' . rawurlencode($file);
+                    $items[] = array('thumb'=>$url, 'main'=>$url, 'full'=>$url, 'alt'=>$product->get_name());
+                }
+                if ($items) { return $items; }
             }
         }
         $ids = array();

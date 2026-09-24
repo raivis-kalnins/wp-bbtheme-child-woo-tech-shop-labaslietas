@@ -161,16 +161,16 @@ add_action('update_option_labaslietas_theme_options', 'labaslietas_v315_queue_st
  */
 function labaslietas_v315_demo_asset_url($product) {
     if (!$product || !is_a($product, 'WC_Product')) { return ''; }
-    $map = array(
-        'LL-DEMO-D20'=>'drill.png','LL-DEMO-C50'=>'compressor.png','LL-DEMO-W200'=>'welder.png','LL-DEMO-G3500'=>'generator.png',
-        'LL-DEMO-J3T'=>'jack.png','LL-DEMO-A1500'=>'impact-wrench.png','LL-DEMO-S108'=>'tool-set.png','LL-DEMO-B26'=>'blower.png',
-        'LL-DEMO-BC52'=>'brushcutter.png','LL-DEMO-H10'=>'trimmer-head.png','LL-DEMO-HALU'=>'aluminum-head.png','LL-DEMO-L24'=>'trimmer-line.png',
-        'LL-DEMO-CS85'=>'chain-sharpener.png','LL-DEMO-OP12'=>'oil-pump.png'
-    );
     $sku = (string) $product->get_sku();
-    if (empty($map[$sku])) { return ''; }
-    $path = get_stylesheet_directory() . '/assets/demo-products/' . $map[$sku];
-    return file_exists($path) ? get_stylesheet_directory_uri() . '/assets/demo-products/' . $map[$sku] : '';
+    if (function_exists('labaslietas_green_demo_item_by_sku')) {
+        $item = labaslietas_green_demo_item_by_sku($sku);
+        if ($item && !empty($item['image'])) {
+            $file = basename($item['image']);
+            $path = get_stylesheet_directory() . '/assets/demo-products/' . $file;
+            if (file_exists($path)) { return get_stylesheet_directory_uri() . '/assets/demo-products/' . rawurlencode($file); }
+        }
+    }
+    return '';
 }
 
 /** Replace stale product thumbnails everywhere for the bundled demo catalogue. */

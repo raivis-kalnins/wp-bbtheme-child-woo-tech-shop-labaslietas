@@ -6,7 +6,7 @@
 defined('ABSPATH') || exit;
 
 if (!defined('LABASLIETAS_GREEN_V2')) {
-    define('LABASLIETAS_GREEN_V2', '3.0.33');
+    define('LABASLIETAS_GREEN_V2', '3.0.46');
 }
 
 function labaslietas_green_icon($name, $class = '') {
@@ -199,7 +199,7 @@ function labaslietas_green_categories($limit = 8) {
     if (function_exists('labaslietas_category_display_order')) { $terms = labaslietas_category_display_order($terms); }
     ob_start(); ?>
     <section class="llg-section llg-categories-section">
-        <div class="llg-section-head"><div><span class="llg-eyebrow">Ātri atrodi vajadzīgo</span><h2>Preču kategorijas</h2></div><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Visas preces <?php echo labaslietas_green_icon('arrow'); ?></a></div>
+        <div class="llg-section-head"><div><span class="llg-eyebrow">Ātri atrodi vajadzīgo</span><h2>Preču kategorijas</h2></div><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><span class="llg-section-link-text">Visas preces</span><span class="llg-section-link-icon"><?php echo labaslietas_green_icon('arrow'); ?></span></a></div>
         <div class="llg-category-grid">
             <?php foreach ($terms as $term) : ?>
                 <a class="llg-category-card" href="<?php echo esc_url(get_term_link($term)); ?>">
@@ -246,16 +246,70 @@ function labaslietas_green_demo_name_309($product) {
 
 function labaslietas_green_product_image_html($product) {
     if (!$product || !is_a($product, 'WC_Product')) { return ''; }
+
     $sku = (string) $product->get_sku();
     $item = $sku !== '' ? labaslietas_green_demo_item_by_sku($sku) : null;
+    $image_id = absint($product->get_image_id());
+    $gallery_ids = array_values(array_filter(array_map('absint', (array) $product->get_gallery_image_ids())));
+
+    $primary_html = '';
+    $secondary_html = '';
+
+    // Demo products use bundled theme assets directly. This keeps Refresh fast and
+    // completely avoids WordPress/Imagick thumbnail generation on shared hosting.
     if ($item && !empty($item['image'])) {
-        $file = trailingslashit(get_stylesheet_directory()) . 'assets/demo-products/' . basename($item['image']);
-        if (file_exists($file)) {
-            $url = trailingslashit(get_stylesheet_directory_uri()) . 'assets/demo-products/' . rawurlencode(basename($item['image']));
-            return '<img src="' . esc_url($url) . '" alt="' . esc_attr(labaslietas_green_demo_name_309($product)) . '" loading="lazy" decoding="async">';
+        $primary_file = basename($item['image']);
+        $primary_path = trailingslashit(get_stylesheet_directory()) . 'assets/demo-products/' . $primary_file;
+        if (file_exists($primary_path)) {
+            $primary_url = trailingslashit(get_stylesheet_directory_uri()) . 'assets/demo-products/' . rawurlencode($primary_file);
+            $primary_html = '<img class="llg-product-image-primary" src="' . esc_url($primary_url) . '" alt="' . esc_attr(labaslietas_green_demo_name_309($product)) . '" loading="lazy" decoding="async">';
+        }
+        foreach ((array) (isset($item['gallery']) ? $item['gallery'] : array()) as $gallery_file) {
+            $gallery_file = basename($gallery_file);
+            $gallery_path = trailingslashit(get_stylesheet_directory()) . 'assets/demo-products/' . $gallery_file;
+            if (!file_exists($gallery_path)) { continue; }
+            $gallery_url = trailingslashit(get_stylesheet_directory_uri()) . 'assets/demo-products/' . rawurlencode($gallery_file);
+            $secondary_html = '<img class="llg-product-image-secondary" src="' . esc_url($gallery_url) . '" alt="" loading="lazy" decoding="async">';
+            break;
         }
     }
-    return $product->get_image('woocommerce_thumbnail', array('loading'=>'lazy','decoding'=>'async'));
+
+    // Real products continue to use their WooCommerce Media Library images.
+    if ($primary_html === '') {
+        if ($image_id) {
+            $primary_html = wp_get_attachment_image($image_id, 'woocommerce_thumbnail', false, array(
+                'class' => 'llg-product-image-primary',
+                'loading' => 'lazy',
+                'decoding' => 'async',
+            ));
+        } else {
+            $primary_html = wc_placeholder_img('woocommerce_thumbnail', array('class' => 'llg-product-image-primary'));
+        }
+    }
+    if ($secondary_html === '') {
+        foreach ($gallery_ids as $gallery_id) {
+            if ($gallery_id && $gallery_id !== $image_id) {
+                $secondary_html = wp_get_attachment_image($gallery_id, 'woocommerce_thumbnail', false, array(
+                    'class' => 'llg-product-image-secondary',
+                    'loading' => 'lazy',
+                    'decoding' => 'async',
+                ));
+                break;
+            }
+        }
+    }
+
+    $classes = 'llg-card-media';
+    if ($secondary_html !== '') { $classes .= ' has-gallery'; }
+    $out  = '<span class="' . esc_attr($classes) . '">';
+    $out .= '<span class="llg-card-media-glow" aria-hidden="true"></span>';
+    $out .= '<span class="llg-card-media-main">' . $primary_html . '</span>';
+    if ($secondary_html !== '') {
+        $out .= '<span class="llg-card-media-secondary" aria-hidden="true">' . $secondary_html . '</span>';
+        $out .= '<span class="llg-card-media-pill">Galerija</span>';
+    }
+    $out .= '</span>';
+    return $out;
 }
 
 function labaslietas_green_product_card($product) {
@@ -299,7 +353,7 @@ function labaslietas_green_products_section($type, $title, $limit = 10, $eyebrow
     $shop = wc_get_page_permalink('shop');
     ob_start(); ?>
     <section class="llg-section llg-products-section">
-        <div class="llg-section-head"><div><?php if ($eyebrow) : ?><span class="llg-eyebrow"><?php echo esc_html($eyebrow); ?></span><?php endif; ?><h2><?php echo esc_html($title); ?></h2></div><a href="<?php echo esc_url($shop); ?>"><?php echo (function_exists('labaslietas_v305_is_english') && labaslietas_v305_is_english()) ? 'View all' : 'Skatīt visas'; ?> <?php echo labaslietas_green_icon('arrow'); ?></a></div>
+        <div class="llg-section-head"><div><?php if ($eyebrow) : ?><span class="llg-eyebrow"><?php echo esc_html($eyebrow); ?></span><?php endif; ?><h2><?php echo esc_html($title); ?></h2></div><a href="<?php echo esc_url($shop); ?>"><span class="llg-section-link-text"><?php echo (function_exists('labaslietas_v305_is_english') && labaslietas_v305_is_english()) ? 'View all' : 'Skatīt visas'; ?></span><span class="llg-section-link-icon"><?php echo labaslietas_green_icon('arrow'); ?></span></a></div>
         <div class="llg-product-grid">
             <?php while ($q->have_posts()) : $q->the_post(); global $product; echo labaslietas_green_product_card($product); endwhile; wp_reset_postdata(); ?>
         </div>
@@ -395,20 +449,20 @@ add_filter('body_class', function($classes){ $classes[] = 'labaslietas-green-v2'
 /** Demo catalogue ***********************************************************/
 function labaslietas_green_demo_catalog() {
     return array(
-        array('sku'=>'LL-DEMO-D20','name'=>'Akumulatora urbjmašīna 20V LABAS PRO D20','category'=>'Instrumenti','image'=>'drill.png','regular'=>'89.00','sale'=>'74.90','stock'=>18,'model'=>'D20','featured'=>1,'short'=>'Kompakta 20V urbjmašīna ikdienas montāžas un remonta darbiem.','description'=>'Oriģināla LABAS LIETAS demo prece dizaina un kataloga demonstrācijai. Komplektācija: urbjmašīna, akumulators un lādētājs. Pirms reālas tirdzniecības precizējiet tehniskos parametrus, cenu un pieejamību.'),
-        array('sku'=>'LL-DEMO-C50','name'=>'Gaisa kompresors 50L 2.2kW LABAS PRO C50','category'=>'Servisa aprīkojums','image'=>'compressor.png','regular'=>'219.00','sale'=>'189.00','stock'=>7,'model'=>'C50','featured'=>1,'short'=>'50 litru kompresors darbnīcai un saimniecības darbiem.','description'=>'Oriģināla LABAS LIETAS demo prece. Paredzēta veikala izkārtojuma demonstrācijai; pirms pārdošanas aizvietojiet demonstrācijas specifikāciju ar faktiskajiem produkta datiem.'),
-        array('sku'=>'LL-DEMO-W200','name'=>'Invertora metināšanas aparāts 200A LABAS PRO W200','category'=>'Specinstrumenti','image'=>'welder.png','regular'=>'129.00','sale'=>'109.00','stock'=>11,'model'=>'W200','featured'=>1,'short'=>'Kompakts invertora metināšanas aparāts mājas darbnīcai.','description'=>'LABAS LIETAS demo kataloga produkts ar oriģinālu nosaukumu un vizuālo materiālu.'),
-        array('sku'=>'LL-DEMO-G3500','name'=>'Benzīna ģenerators 3.5kW LABAS PRO G3500','category'=>'Dārza tehnika','image'=>'generator.png','regular'=>'399.00','sale'=>'349.00','stock'=>5,'model'=>'G3500','featured'=>1,'short'=>'Pārvietojams benzīna ģenerators saimniecībai un izbraukuma darbiem.','description'=>'LABAS LIETAS demo kataloga produkts. Tehniskie parametri un pieejamība pirms reālas pārdošanas jāaizstāj ar faktiskajiem datiem.'),
-        array('sku'=>'LL-DEMO-J3T','name'=>'Hidrauliskais domkrats 3T LABAS PRO J3T','category'=>'Servisa aprīkojums','image'=>'jack.png','regular'=>'79.00','sale'=>'64.90','stock'=>13,'model'=>'J3T','featured'=>0,'short'=>'Zema profila hidrauliskais domkrats garāžai un servisam.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-A1500','name'=>'Pneimatiskais triecienatslēga 1/2 LABAS PRO A1500','category'=>'Instrumenti','image'=>'impact-wrench.png','regular'=>'99.00','sale'=>'84.90','stock'=>16,'model'=>'A1500','featured'=>1,'short'=>'Pneimatiskais triecieninstruments riteņu un servisa darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-S108','name'=>'Instrumentu komplekts 108 gab. LABAS PRO S108','category'=>'Instrumenti','image'=>'tool-set.png','regular'=>'119.00','sale'=>'99.00','stock'=>22,'model'=>'S108','featured'=>1,'short'=>'Universāls instrumentu komplekts koferī darbnīcai un mājai.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-B26','name'=>'Lapu pūtējs 2-in-1 LABAS PRO B26','category'=>'Dārza tehnika','image'=>'blower.png','regular'=>'89.00','sale'=>'','stock'=>9,'model'=>'B26','featured'=>0,'short'=>'Kompakts lapu pūtējs dārza un pagalma kopšanai.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-BC52','name'=>'Benzīna krūmgriezis 52cc LABAS PRO BC52','category'=>'Dārza tehnika','image'=>'brushcutter.png','regular'=>'139.00','sale'=>'119.00','stock'=>8,'model'=>'BC52','featured'=>1,'short'=>'Krūmgriezis zāles, nezāļu un pagalma kopšanas darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-H10','name'=>'Pusautomātiskā auklas galva M10x1.25 LABAS PRO H10','category'=>'Rezerves daļas','image'=>'trimmer-head.png','regular'=>'19.90','sale'=>'15.90','stock'=>34,'model'=>'H10','featured'=>1,'short'=>'Universāla trimmera auklas galva ar M10x1.25 vītni.','description'=>'Oriģināla demo prece, iedvesmota no populāras dārza piederumu kategorijas. Pārbaudiet savietojamību ar konkrēto tehniku pirms pārdošanas.'),
-        array('sku'=>'LL-DEMO-HALU','name'=>'Universālā alumīnija trimmera galva LABAS PRO HALU','category'=>'Rezerves daļas','image'=>'aluminum-head.png','regular'=>'24.90','sale'=>'19.90','stock'=>28,'model'=>'HALU','featured'=>0,'short'=>'Kompakta alumīnija trimmera galva intensīvākiem darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-L24','name'=>'Trimmera aukla 2.4 mm × 100 m LABAS PRO L24','category'=>'Rezerves daļas','image'=>'trimmer-line.png','regular'=>'18.90','sale'=>'14.90','stock'=>42,'model'=>'L24','featured'=>0,'short'=>'Izturīga trimmera aukla ikdienas zāles pļaušanas darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-CS85','name'=>'Zāģa ķēdes asināšanas iekārta LABAS PRO CS85','category'=>'Specinstrumenti','image'=>'chain-sharpener.png','regular'=>'59.00','sale'=>'49.00','stock'=>10,'model'=>'CS85','featured'=>0,'short'=>'Kompakta iekārta motorzāģa ķēžu apkopes darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
-        array('sku'=>'LL-DEMO-OP12','name'=>'Eļļas maiņas sūknis 12V LABAS PRO OP12','category'=>'Servisa aprīkojums','image'=>'oil-pump.png','regular'=>'29.90','sale'=>'24.90','stock'=>25,'model'=>'OP12','featured'=>0,'short'=>'12V sūknis eļļas pārsūknēšanas un apkopes darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-D20','name'=>'Akumulatora urbjmašīna 20V LABAS PRO D20','category'=>'Instrumenti','image'=>'drill-v46.png','regular'=>'89.00','sale'=>'74.90','stock'=>18,'model'=>'D20','featured'=>1,'short'=>'Kompakta 20V urbjmašīna ikdienas montāžas un remonta darbiem.','description'=>'Oriģināla LABAS LIETAS demo prece dizaina un kataloga demonstrācijai. Komplektācija: urbjmašīna, akumulators un lādētājs. Pirms reālas tirdzniecības precizējiet tehniskos parametrus, cenu un pieejamību.'),
+        array('sku'=>'LL-DEMO-C50','name'=>'Gaisa kompresors 50L 2.2kW LABAS PRO C50','category'=>'Servisa aprīkojums','image'=>'compressor-realistic-v46.png','regular'=>'219.00','sale'=>'189.00','stock'=>7,'model'=>'C50','featured'=>1,'short'=>'50 litru kompresors darbnīcai un saimniecības darbiem.','description'=>'Oriģināla LABAS LIETAS demo prece. Paredzēta veikala izkārtojuma demonstrācijai; pirms pārdošanas aizvietojiet demonstrācijas specifikāciju ar faktiskajiem produkta datiem.'),
+        array('sku'=>'LL-DEMO-W200','name'=>'Invertora metināšanas aparāts 200A LABAS PRO W200','category'=>'Specinstrumenti','image'=>'welder-v43-v46.png','gallery'=>array('welder-gallery-v46.png'),'regular'=>'129.00','sale'=>'109.00','stock'=>11,'model'=>'W200','featured'=>1,'short'=>'Kompakts invertora metināšanas aparāts mājas darbnīcai.','description'=>'LABAS LIETAS demo kataloga produkts ar oriģinālu nosaukumu un vizuālo materiālu.'),
+        array('sku'=>'LL-DEMO-G3500','name'=>'Benzīna ģenerators 3.5kW LABAS PRO G3500','category'=>'Dārza tehnika','image'=>'generator-realistic-v46.png','gallery'=>array('generator-gallery-v46.png'),'regular'=>'399.00','sale'=>'349.00','stock'=>5,'model'=>'G3500','featured'=>1,'short'=>'Pārvietojams benzīna ģenerators saimniecībai un izbraukuma darbiem.','description'=>'LABAS LIETAS demo kataloga produkts. Tehniskie parametri un pieejamība pirms reālas pārdošanas jāaizstāj ar faktiskajiem datiem.'),
+        array('sku'=>'LL-DEMO-J3T','name'=>'Hidrauliskais domkrats 3T LABAS PRO J3T','category'=>'Servisa aprīkojums','image'=>'jack-v43-v46.png','gallery'=>array('jack-gallery-v46.png'),'regular'=>'79.00','sale'=>'64.90','stock'=>13,'model'=>'J3T','featured'=>0,'short'=>'Zema profila hidrauliskais domkrats garāžai un servisam.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-A1500','name'=>'Pneimatiskais triecienatslēga 1/2 LABAS PRO A1500','category'=>'Instrumenti','image'=>'impact-wrench-realistic-v46.png','gallery'=>array('impact-wrench-gallery-v46.png'),'regular'=>'99.00','sale'=>'84.90','stock'=>16,'model'=>'A1500','featured'=>1,'short'=>'Pneimatiskais triecieninstruments riteņu un servisa darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-S108','name'=>'Instrumentu komplekts 108 gab. LABAS PRO S108','category'=>'Instrumenti','image'=>'tool-set-realistic-v46.png','gallery'=>array('tool-set-gallery-v46.png'),'regular'=>'119.00','sale'=>'99.00','stock'=>22,'model'=>'S108','featured'=>1,'short'=>'Universāls instrumentu komplekts koferī darbnīcai un mājai.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-B26','name'=>'Lapu pūtējs 2-in-1 LABAS PRO B26','category'=>'Dārza tehnika','image'=>'blower-v45-v46.png','regular'=>'89.00','sale'=>'','stock'=>9,'model'=>'B26','featured'=>0,'short'=>'Kompakts lapu pūtējs dārza un pagalma kopšanai.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-BC52','name'=>'Benzīna krūmgriezis 52cc LABAS PRO BC52','category'=>'Dārza tehnika','image'=>'brushcutter-realistic-v46.png','regular'=>'139.00','sale'=>'119.00','stock'=>8,'model'=>'BC52','featured'=>1,'short'=>'Krūmgriezis zāles, nezāļu un pagalma kopšanas darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-H10','name'=>'Pusautomātiskā auklas galva M10x1.25 LABAS PRO H10','category'=>'Rezerves daļas','image'=>'trimmer-head-v43-v46.png','gallery'=>array('trimmer-head-gallery-v46.png'),'regular'=>'19.90','sale'=>'15.90','stock'=>34,'model'=>'H10','featured'=>1,'short'=>'Universāla trimmera auklas galva ar M10x1.25 vītni.','description'=>'Oriģināla demo prece, iedvesmota no populāras dārza piederumu kategorijas. Pārbaudiet savietojamību ar konkrēto tehniku pirms pārdošanas.'),
+        array('sku'=>'LL-DEMO-HALU','name'=>'Universālā alumīnija trimmera galva LABAS PRO HALU','category'=>'Rezerves daļas','image'=>'aluminum-head-v45-v46.png','gallery'=>array('aluminum-head-gallery-v45-v46.png'),'regular'=>'24.90','sale'=>'19.90','stock'=>28,'model'=>'HALU','featured'=>0,'short'=>'Kompakta alumīnija trimmera galva intensīvākiem darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-L24','name'=>'Trimmera aukla 2.4 mm × 100 m LABAS PRO L24','category'=>'Rezerves daļas','image'=>'trimmer-line-v45-v46.png','gallery'=>array('trimmer-line-gallery-1-v45-v46.png','trimmer-line-gallery-2-v45-v46.png'),'regular'=>'18.90','sale'=>'14.90','stock'=>42,'model'=>'L24','featured'=>0,'short'=>'Izturīga trimmera aukla ikdienas zāles pļaušanas darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-CS85','name'=>'Zāģa ķēdes asināšanas iekārta LABAS PRO CS85','category'=>'Specinstrumenti','image'=>'chain-sharpener-v43-v46.png','regular'=>'59.00','sale'=>'49.00','stock'=>10,'model'=>'CS85','featured'=>0,'short'=>'Kompakta iekārta motorzāģa ķēžu apkopes darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
+        array('sku'=>'LL-DEMO-OP12','name'=>'Eļļas maiņas sūknis 12V LABAS PRO OP12','category'=>'Servisa aprīkojums','image'=>'oil-pump-v43-v46.png','gallery'=>array('oil-pump-gallery-v46.png'),'regular'=>'29.90','sale'=>'24.90','stock'=>25,'model'=>'OP12','featured'=>0,'short'=>'12V sūknis eļļas pārsūknēšanas un apkopes darbiem.','description'=>'Oriģināla demo prece veikala izskata demonstrācijai.'),
     );
 }
 
@@ -514,6 +568,12 @@ function labaslietas_green_seed_demo_catalog() {
         if (isset($category_ids[$item['category']])) { $product->set_category_ids(array($category_ids[$item['category']])); }
         $image_id = labaslietas_green_demo_attachment($item['image'], $item['name']);
         if ($image_id) { $product->set_image_id($image_id); }
+        $gallery_ids = array();
+        foreach ((array) (isset($item['gallery']) ? $item['gallery'] : array()) as $gallery_file) {
+            $gallery_id = labaslietas_green_demo_attachment($gallery_file, $item['name'] . ' — galerija');
+            if ($gallery_id && $gallery_id !== $image_id) { $gallery_ids[] = $gallery_id; }
+        }
+        $product->set_gallery_image_ids(array_values(array_unique($gallery_ids)));
         try {
             $saved_id = $product->save();
         } catch (Exception $e) {
@@ -534,6 +594,18 @@ function labaslietas_green_seed_demo_catalog() {
     update_option('labaslietas_green_demo_seeded', LABASLIETAS_GREEN_V2, false);
     if (function_exists('labaslietas_compare_feed_invalidate')) { labaslietas_compare_feed_invalidate(); }
     return array('created'=>$created,'updated'=>$updated);
+}
+
+function labaslietas_green_remove_demo_assets() {
+    $ids = get_posts(array(
+        'post_type'=>'attachment','post_status'=>'inherit','posts_per_page'=>-1,'fields'=>'ids',
+        'meta_key'=>'_labaslietas_demo_asset','meta_compare'=>'EXISTS',
+    ));
+    $deleted = 0;
+    foreach ((array) $ids as $id) {
+        if (wp_delete_attachment(absint($id), true)) { $deleted++; }
+    }
+    return $deleted;
 }
 
 function labaslietas_green_remove_demo_catalog() {
@@ -718,6 +790,70 @@ function labaslietas_green_seed_demo_products_lightweight() {
     return array('created'=>$created,'updated'=>$updated);
 }
 
+function labaslietas_green_refresh_demo_catalog() {
+    if (!class_exists('WooCommerce')) { return new WP_Error('woocommerce_missing', 'WooCommerce nav aktīvs.'); }
+
+    // Refresh in place instead of deleting/recreating everything. This preserves
+    // product IDs and keeps the request lightweight on shared hosting.
+    $catalog = labaslietas_green_demo_catalog();
+    $allowed_skus = array();
+    foreach ($catalog as $item) {
+        if (!empty($item['sku'])) { $allowed_skus[] = (string) $item['sku']; }
+    }
+
+    $obsolete_deleted = 0;
+    $demo_ids = get_posts(array(
+        'post_type' => 'product',
+        'post_status' => 'any',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'meta_key' => '_labaslietas_demo_product',
+        'meta_value' => '1',
+    ));
+    foreach ((array) $demo_ids as $demo_id) {
+        $demo_product = wc_get_product($demo_id);
+        if (!$demo_product) { continue; }
+        $sku = (string) $demo_product->get_sku();
+        if ($sku !== '' && !in_array($sku, $allowed_skus, true)) {
+            if (wp_delete_post($demo_id, true)) { $obsolete_deleted++; }
+        }
+    }
+
+    // Do not create, resize, regenerate or delete Media Library attachments here.
+    // Demo cards and galleries read realistic images directly from the theme files,
+    // so Imagick is not involved in Demo Refresh at all.
+    $result = labaslietas_green_seed_demo_products_lightweight();
+    if (is_wp_error($result)) { return $result; }
+
+    // Keep the monthly "3 Lietas" block valid without replacing working selections.
+    if (defined('LABASLIETAS_MONTHLY_PICKS_OPTION') && function_exists('labaslietas_v333_monthly_default_ids')) {
+        $settings = get_option(LABASLIETAS_MONTHLY_PICKS_OPTION, array());
+        if (!is_array($settings)) { $settings = array(); }
+        $ids = labaslietas_v333_monthly_default_ids();
+        for ($i = 1; $i <= 3; $i++) {
+            $current_id = !empty($settings['product_' . $i]) ? absint($settings['product_' . $i]) : 0;
+            if (!$current_id || !wc_get_product($current_id)) {
+                $settings['product_' . $i] = isset($ids[$i - 1]) ? (string) absint($ids[$i - 1]) : '';
+            }
+        }
+        if (!isset($settings['enabled'])) { $settings['enabled'] = '1'; }
+        if (empty($settings['month']) && function_exists('labaslietas_v333_monthly_current_month')) {
+            $settings['month'] = labaslietas_v333_monthly_current_month();
+        }
+        if (!isset($settings['custom_title'])) { $settings['custom_title'] = ''; }
+        update_option(LABASLIETAS_MONTHLY_PICKS_OPTION, $settings, false);
+    }
+
+    if (function_exists('wc_delete_product_transients')) { wc_delete_product_transients(); }
+    delete_transient('wc_products_onsale');
+    return array(
+        'deleted_products' => absint($obsolete_deleted),
+        'deleted_assets' => 0,
+        'created' => isset($result['created']) ? absint($result['created']) : 0,
+        'updated' => isset($result['updated']) ? absint($result['updated']) : 0,
+    );
+}
+
 add_action('admin_menu', function(){
     add_theme_page('LABAS LIETAS Demo', 'LABAS LIETAS Demo', 'manage_options', 'labaslietas-green-demo', 'labaslietas_green_demo_admin_page');
 }, 30);
@@ -726,14 +862,66 @@ function labaslietas_green_demo_admin_page() {
     if (!current_user_can('manage_options')) { return; }
     $notice = isset($_GET['ll_demo_notice']) ? sanitize_text_field(wp_unslash($_GET['ll_demo_notice'])) : '';
     ?>
-    <div class="wrap"><h1>LABAS LIETAS Green Storefront</h1>
-      <?php if ($notice) : ?><div class="notice notice-success is-dismissible"><p><?php echo esc_html($notice); ?></p></div><?php endif; ?>
-      <p>Theme v<?php echo esc_html(LABASLIETAS_GREEN_V2); ?> — zaļš WooCommerce veikala dizains ar oriģinālu demo katalogu.</p><p><strong>Drošības labojums:</strong> demo katalogs vairs netiek importēts automātiski wp-admin ielādes laikā. Importu palaidiet tikai ar zemāk esošo pogu.</p>
-      <div class="card" style="max-width:900px"><h2>Demo katalogs</h2><p>Demo preces ir oriģinālas un nav kopētas no citiem veikaliem. Tās ir redzamas veikalā, bet drošības dēļ ir izslēgtas no KurPirkt.lv un Salidzini.lv XML plūsmām, līdz jūs apstiprināt reālu cenu, noliktavas atlikumu un produkta parametrus.</p>
-      <p><a class="button button-primary" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=labaslietas_green_seed_demo'),'labaslietas_green_seed_demo')); ?>">Uzstādīt / atjaunot demo katalogu</a> <a class="button" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=labaslietas_green_remove_demo'),'labaslietas_green_remove_demo')); ?>" onclick="return confirm('Dzēst visas LABAS LIETAS demo preces?');">Dzēst demo preces</a></p></div>
-      <div class="card" style="max-width:900px"><h2>KurPirkt.lv un Salidzini.lv</h2><p><strong>KurPirkt.lv XML:</strong> <code><?php echo esc_html(home_url('/kurpirkt.xml')); ?></code><br><strong>Salidzini.lv XML:</strong> <code><?php echo esc_html(home_url('/salidzini.xml')); ?></code></p><p>Theme ģenerē un atjauno XML plūsmas un rāda sadarbības banerus kājenē. Lai portāli sāktu importēt preces, veikals vēl jāreģistrē pie katra pakalpojuma ar jūsu īstajiem uzņēmuma rekvizītiem un jāiesniedz attiecīgā XML saite.</p></div>
+    <div class="wrap ll-demo-admin">
+      <style>
+        .ll-demo-admin{max-width:1120px;margin-top:18px}.ll-demo-shell{display:grid;gap:18px}.ll-demo-hero{padding:26px 28px;border-radius:20px;background:linear-gradient(135deg,#123d26,#228145);color:#fff;box-shadow:0 18px 42px rgba(18,51,74,.09)}.ll-demo-hero h1{margin:4px 0 8px;color:#fff;font-size:32px;line-height:1.05}.ll-demo-hero p{max-width:800px;margin:0;color:rgba(255,255,255,.9);font-size:15px;line-height:1.55}.ll-demo-kicker{display:inline-flex;align-items:center;min-height:27px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.14);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.ll-demo-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.ll-demo-card{background:#fff;border:1px solid #dbe5df;border-radius:18px;padding:22px;box-shadow:0 10px 28px rgba(18,51,74,.04)}.ll-demo-card h2{margin:0 0 7px;font-size:21px}.ll-demo-card p{margin:0 0 15px;color:#5e6c76;line-height:1.55}.ll-demo-card.is-main{border-color:#c9dfd0;background:linear-gradient(180deg,#fff,#f5faf6)}.ll-demo-refresh{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px;border-radius:15px;background:#eef8f0;border:1px solid #d2e8d7}.ll-demo-refresh strong{display:block;margin-bottom:4px;color:#174c2a}.ll-demo-refresh small{display:block;color:#5f6f78;line-height:1.45}.ll-demo-admin .button-primary{min-height:44px;padding:0 18px;border-radius:11px;background:#2b9748;border-color:#2b9748;font-weight:700}.ll-demo-admin .button-primary:hover{background:#227f3c;border-color:#227f3c}.ll-demo-danger{margin-top:16px;padding-top:16px;border-top:1px solid #e5ece8}.ll-demo-danger .button{color:#a6232c;border-color:#d6a9ad}.ll-demo-list{display:grid;gap:10px;margin:14px 0 0}.ll-demo-list span{display:flex;align-items:flex-start;gap:9px;color:#314957}.ll-demo-list span:before{content:'✓';display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#e8f6eb;color:#21783f;font-weight:800;flex:0 0 20px}.ll-demo-feed code{display:block;margin-top:6px;padding:8px 10px;white-space:normal;word-break:break-all}.ll-demo-note{margin-top:12px!important;font-size:12px}.ll-demo-version{margin-top:12px;font-size:12px;color:#82909a}.ll-demo-alert{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:10px;margin:0;padding:12px 12px 12px 14px;border:1px solid #b8dfc2;border-radius:14px;background:#f0faf3!important;color:#173c25!important;box-shadow:0 8px 22px rgba(18,76,42,.06)}.ll-demo-alert p{margin:0!important;color:#173c25!important;font-size:14px!important;line-height:1.45!important;font-weight:650!important}.ll-demo-alert-icon{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#248a45;color:#fff;font-size:16px;font-weight:900}.ll-demo-alert-close{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;color:#315a3d!important;text-decoration:none!important;font-size:22px;font-weight:700;line-height:1}.ll-demo-alert-close:hover,.ll-demo-alert-close:focus{background:#dff1e4;color:#173c25!important;box-shadow:none!important}.ll-demo-admin .notice,.ll-demo-admin .notice p{color:#173c25!important}.ll-demo-admin .notice-success{background:#f0faf3!important;border-left-color:#248a45!important}.ll-demo-admin .notice-warning{background:#fff8e8!important;color:#6a4900!important}.ll-demo-admin .notice-error{background:#fff0f1!important;color:#7a1f28!important}@media(max-width:850px){.ll-demo-grid{grid-template-columns:1fr}.ll-demo-refresh{align-items:flex-start;flex-direction:column}}
+      </style>
+      <div class="ll-demo-shell">
+        <div class="ll-demo-hero">
+          <span class="ll-demo-kicker">Demo Refresh</span>
+          <h1>LABAS LIETAS Demo katalogs</h1>
+          <p>Ar vienu pogu vari atjaunot visas LABAS LIETAS demo preces. Reālistiskie attēli un galerijas tiek ielādēti tieši no tēmas, tāpēc Refresh vairs nedarbina Imagick.</p>
+        </div>
+        <?php if ($notice) : ?>
+          <div class="ll-demo-alert is-success" role="status" aria-live="polite">
+            <span class="ll-demo-alert-icon" aria-hidden="true">✓</span>
+            <p><?php echo esc_html($notice); ?></p>
+            <a class="ll-demo-alert-close" href="<?php echo esc_url(remove_query_arg('ll_demo_notice')); ?>" aria-label="Aizvērt paziņojumu">×</a>
+          </div>
+        <?php endif; ?>
+        <div class="ll-demo-grid">
+          <section class="ll-demo-card is-main">
+            <h2>Pilns Demo Refresh</h2>
+            <p>Droši atjauno demo preču datus esošajās precēs, saglabā preču ID un izmanto tēmas iebūvētos attēlus / galerijas bez Media Library pārģenerēšanas.</p>
+            <div class="ll-demo-refresh">
+              <div><strong>Nomainīt visu Demo katalogu</strong><small>Atjaunos cenas, akcijas, noliktavu, kategorijas, attēlus un galerijas. Esošās preču ID paliek nemainīgas.</small></div>
+              <a class="button button-primary" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=labaslietas_green_refresh_demo'),'labaslietas_green_refresh_demo')); ?>" onclick="return confirm('Atjaunot visas LABAS LIETAS demo preces drošajā režīmā? Tavi īstie produkti netiks mainīti.');">Refresh visu Demo</a>
+            </div>
+            <div class="ll-demo-list">
+              <span>Reālistiskie produktu attēli tiek ielādēti tieši no tēmas failiem.</span>
+              <span>Produktu galerijas darbojas no tēmas failiem un neprasa Media Library apstrādi.</span>
+              <span>Cenas, akcijas, noliktava, kategorijas un apraksti tiek atgriezti uz Demo noklusējumu.</span>
+              <span>“3 Lietas” izvēlētās demo preces pēc Refresh paliek derīgas, jo preču ID netiek pārradītas.</span>
+            </div>
+            <div class="ll-demo-danger">
+              <p><strong>Ja demo vairs nevajag:</strong></p>
+              <a class="button" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=labaslietas_green_remove_demo'),'labaslietas_green_remove_demo')); ?>" onclick="return confirm('Dzēst visas LABAS LIETAS demo preces?');">Dzēst Demo katalogu</a>
+            </div>
+          </section>
+          <aside class="ll-demo-card ll-demo-feed">
+            <h2>XML plūsmas</h2>
+            <p>Demo preces drošības dēļ paliek izslēgtas no cenu salīdzināšanas plūsmām, kamēr tās nav aizstātas ar reāliem produktiem.</p>
+            <strong>KurPirkt.lv</strong><code><?php echo esc_html(home_url('/kurpirkt.xml')); ?></code>
+            <strong>Salidzini.lv</strong><code><?php echo esc_html(home_url('/salidzini.xml')); ?></code>
+            <p class="ll-demo-note"><strong>Drošais Refresh:</strong> Media Library un Imagick netiek darbināti.</p><p class="ll-demo-note">Refresh neietekmē tavus īstos produktus, pasūtījumus vai klientu datus.</p>
+            <div class="ll-demo-version">Theme v<?php echo esc_html(LABASLIETAS_GREEN_V2); ?></div>
+          </aside>
+        </div>
+      </div>
     </div><?php
 }
+
+add_action('admin_post_labaslietas_green_refresh_demo', function(){
+    if (!current_user_can('manage_options')) { wp_die('Nav tiesību.'); }
+    check_admin_referer('labaslietas_green_refresh_demo');
+    $result = labaslietas_green_refresh_demo_catalog();
+    if (is_wp_error($result)) {
+        $message = $result->get_error_message();
+    } else {
+        $message = sprintf('Demo Refresh pabeigts drošajā režīmā: noņemtas %d novecojušas demo preces, izveidotas %d jaunas un atjaunoti produktu dati / tēmas galerijas.', $result['deleted_products'], $result['created']);
+    }
+    wp_safe_redirect(add_query_arg(array('page'=>'labaslietas-green-demo','ll_demo_notice'=>$message), admin_url('themes.php'))); exit;
+});
 
 add_action('admin_post_labaslietas_green_seed_demo', function(){
     if (!current_user_can('manage_options')) { wp_die('Nav tiesību.'); }

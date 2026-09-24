@@ -129,7 +129,8 @@ add_action('admin_init',function(){ if (!current_user_can('manage_options')) ret
 /* Hide parent demo products from every front-end query even before cleanup. */
 add_action('pre_get_posts',function($q){ if (is_admin() || !($q instanceof WP_Query)) return; $pt=$q->get('post_type'); $product=$pt==='product'||(is_array($pt)&&in_array('product',$pt,true))||$q->is_post_type_archive('product')||$q->is_tax('product_cat')||$q->is_tax('product_tag'); if (!$product) return; $blocked=labaslietas_parent_demo_product_ids_300(); if ($blocked) $q->set('post__not_in',array_values(array_unique(array_merge((array)$q->get('post__not_in'),$blocked)))); },999);
 
-function labaslietas_starter_page_300(){ if (!current_user_can('edit_theme_options')) return; $done=isset($_GET['llsync'])&&$_GET['llsync']==='done'; ?>
-<div class="wrap"><h1>Labas Lietas — Starter Setup</h1><?php if($done):?><div class="notice notice-success"><p>Labas Lietas datubāze un demo saturs ir sinhronizēts.</p></div><?php endif;?><p><strong>Active setup:</strong> WooCommerce — Labas Lietas</p><div class="card" style="max-width:900px;padding:22px"><h2>Repair / Sync</h2><p>Droša datubāzes sinhronizācija bez attēlu ģenerēšanas: LV + EN, izvēlnes, sākumlapa, WooCommerce lapas, Labas Lietas demo katalogs un Business demo tīrīšana.</p><form method="post" action="<?php echo esc_url(admin_url('admin-post.php'));?>"><input type="hidden" name="action" value="labaslietas_repair_300"><?php wp_nonce_field('labaslietas_repair_300'); submit_button('Repair / Sync Labas Lietas','primary','submit',false);?></form></div></div><?php }
-add_action('admin_menu',function(){ remove_submenu_page('themes.php','wp-theme-starter-setup'); add_theme_page('Labas Lietas Starter Setup','Starter Setup','edit_theme_options','wp-theme-starter-setup','labaslietas_starter_page_300'); },9999);
-add_action('admin_post_labaslietas_repair_300',function(){ if(!current_user_can('edit_theme_options')) wp_die('Nav tiesību.'); check_admin_referer('labaslietas_repair_300'); labaslietas_repair_all_300(); wp_safe_redirect(add_query_arg('llsync','done',admin_url('themes.php?page=wp-theme-starter-setup'))); exit; });
+/* Starter Setup / Repair UI retired in 3.0.41. Keep the compatibility repair helpers above,
+ * but do not expose a duplicate Repair / Sync screen in Appearance. */
+add_action('admin_menu', function(){
+    remove_submenu_page('themes.php', 'wp-theme-starter-setup');
+}, 9999);
